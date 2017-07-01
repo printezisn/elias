@@ -115,6 +115,10 @@
     <Compile Include="Migrations\201707011152346_LeaveRequest_RequestDate.Designer.cs">
       <DependentUpon>201707011152346_LeaveRequest_RequestDate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201707011628101_BotFields.cs" />
+    <Compile Include="Migrations\201707011628101_BotFields.Designer.cs">
+      <DependentUpon>201707011628101_BotFields.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repository\DataRepository.cs" />
@@ -139,6 +143,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201707011152346_LeaveRequest_RequestDate.resx">
       <DependentUpon>201707011152346_LeaveRequest_RequestDate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201707011628101_BotFields.resx">
+      <DependentUpon>201707011628101_BotFields.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

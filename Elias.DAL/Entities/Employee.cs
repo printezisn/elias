@@ -48,6 +48,12 @@ namespace Elias.DAL.Entities
         [SCIMaxLength(1024)]
         public string ServiceUrl { get; set; }
 
+        [SCIMaxLength(250)]
+        public string LastUsedId { get; set; }
+
+        [SCIMaxLength(250)]
+        public string BotId { get; set; }
+
         #region Custom Properties
 
         [NotMapped]

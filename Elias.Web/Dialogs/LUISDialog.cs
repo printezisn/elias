@@ -19,11 +19,34 @@ namespace Elias.Web.Dialogs
     [Serializable]
     public class LUISDialog : LuisDialog<object>
     {
-       
+        private Employee GetEmployee(IActivity activity, IDataRepository db)
+        {
+            Employee employee = null;
+
+            if (activity.ChannelId != null && activity.ChannelId.ToLower() == "facebook")
+            {
+                employee = db.GetEmployees(true).FirstOrDefault(f => f.FacebookId == activity.From.Id);
+            }
+            else
+            {
+                employee = db.GetEmployees(true).FirstOrDefault(f => f.SkypeId == activity.From.Id);
+            }
+
+            if (employee != null)
+            {
+                employee.ServiceUrl = activity.ServiceUrl;
+                employee.LastUsedId = activity.From.Id;
+                employee.BotId = activity.Recipient.Id;
+                db.Save();
+            }
+
+            return employee;
+        }
+
         #region Intents
         [LuisIntent("")]
         [LuisIntent("None")]
-        public async Task None (IDialogContext context, LuisResult result)
+        public async Task None(IDialogContext context, LuisResult result)
         {
             await context.PostAsync($"i'm sorry I didn't get this. If you are having trouble you can type \"help\" help or you can contact my human supervisor on manager@gamaoya.com");
         }
@@ -81,7 +104,7 @@ namespace Elias.Web.Dialogs
         {
             using (var db = new DataRepository())
             {
-                var employee = db.GetEmployees(false).FirstOrDefault(e => e.SkypeId == context.Activity.From.Id);
+                var employee = GetEmployee(context.Activity, db);
                 if (employee != null)
                 {
                     EmployeeHelper.SetReservedDays(db, employee);
@@ -94,7 +117,7 @@ namespace Elias.Web.Dialogs
                 }
             }
         }
-       
+
         #endregion
     }
 }

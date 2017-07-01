@@ -15,6 +15,7 @@ using Elias.Web.Models;
 using Elias.Web.Models.Enums;
 using Elias.DAL.Enums;
 using Elias.Web.Hubs;
+using System.Threading.Tasks;
 
 namespace Elias.Web.Controllers
 {
@@ -66,7 +67,7 @@ namespace Elias.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public JsonResult Accept(Guid id)
+        public async Task<JsonResult> Accept(Guid id)
         {
             try
             {
@@ -93,6 +94,7 @@ namespace Elias.Web.Controllers
                 NotificationHub.UpdateLeaveRequests();
 
                 // TODO: Send message to employee
+                await EmployeeHelper.SendMessage(leaveRequest.Employee, $"Your leave request from {leaveRequest.FromDate.ToString("yyyy-MM-dd")} to {leaveRequest.ToDate.ToString("yyyy-MM-dd")} was accepted!");
 
                 return Json(new { Message = new ToastrMessage(null, "The leave request was accepted successfully!", ToastrMessageTypeEnum.Success) });
             }
@@ -104,7 +106,7 @@ namespace Elias.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public JsonResult Reject(Guid id)
+        public async Task<JsonResult> Reject(Guid id)
         {
             try
             {
@@ -125,6 +127,7 @@ namespace Elias.Web.Controllers
                 NotificationHub.UpdateLeaveRequests();
 
                 // TODO: Send message to employee
+                await EmployeeHelper.SendMessage(leaveRequest.Employee, $"Your leave request from {leaveRequest.FromDate.ToString("yyyy-MM-dd")} to {leaveRequest.ToDate.ToString("yyyy-MM-dd")} was rejected.");
 
                 return Json(new { Message = new ToastrMessage(null, "The leave request was rejected successfully!", ToastrMessageTypeEnum.Success) });
             }
