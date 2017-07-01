@@ -1,0 +1,43 @@
+﻿@model SCIPagedList<Elias.DAL.Entities.LeaveRequest>
+
+@{
+    ViewBag.Title = "Leave Requests";
+}
+
+@section Breadcrumb {
+    <ul class="breadcrumb">
+		<li>
+			<a href="@Url.Action("index", "home")">Dashboard</a>
+		</li>
+        <li class="active">
+            <span>@ViewBag.Title</span>
+        </li>
+    </ul>
+}
+
+<h3>@ViewBag.Title</h3>
+
+<hr />
+<br />
+
+<div class="row">
+	<div class="col-sm-6 col-sm-offset-6">
+		@using (Html.BeginForm("index", "leaverequests", FormMethod.Get))
+        {
+            <div class="input-group">
+                <input type="text" class="form-control placeholder-no-fix" name="searchTerm" value="@Model.SearchTerm" placeholder="Search...">
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </span>
+            </div>
+        }
+	</div>
+</div>
+<br />
+
+<div class="sci-ajax-grid" data-url="@Url.Action("index")" data-use-history>
+	@Html.Partial("Grid", Model)
+</div>
+

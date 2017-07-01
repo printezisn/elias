@@ -29,6 +29,9 @@ namespace Elias.DAL.Entities
         [DisplayName("Status")]
         public byte StatusId { get; set; }
 
+        [DisplayName("Request Date")]
+        public DateTime RequestDate { get; set; }
+
         #region Navigation Properties
 
         [JsonIgnore]

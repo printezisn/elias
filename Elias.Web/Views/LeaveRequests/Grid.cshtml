@@ -1,0 +1,52 @@
+﻿@model SCIPagedList<Elias.DAL.Entities.LeaveRequest>
+
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover dataTable gray-table">
+        <thead>
+            <tr>
+                @Html.SCISortHeader("Name", "name", Model.SortBy, Model.IsAscendingOrder)
+                <th>@Html.DisplayNameFor(model => model.FirstOrDefault().Employee.ReservedDays)</th>
+                <th>Requested Days</th>
+                @Html.SCISortHeader("Status", "status", Model.SortBy, Model.IsAscendingOrder)
+                @Html.SCISortHeader(Html.DisplayNameFor(model => model.FirstOrDefault().RequestDate), "requestdate", Model.SortBy, Model.IsAscendingOrder)
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @item.Employee.FirstName @item.Employee.LastName
+                    </td>
+                    <td>
+                        @item.Employee.ReservedDays/@item.Employee.LeaveDays
+                    </td>
+                    <td>
+                        @DateHelper.RenderDate(item.FromDate)
+                        -
+                        @DateHelper.RenderDate(item.ToDate)
+                        /
+                        <strong>@item.TotalDays Day(s)</strong>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Status.Name)
+                    </td>
+                    <td>
+                        @DateHelper.RenderDateTime(item.RequestDate)
+                    </td>
+                    <td>
+                        
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (Model.Any())
+{
+    @Html.Partial("Pager", Model)
+}
+

@@ -37,6 +37,7 @@ namespace Elias.DAL.Migrations
                 leaveRequest.FromDate = new DateTime(DateTime.UtcNow.Year, 1, 1);
                 leaveRequest.ToDate = leaveRequest.FromDate.AddDays(5);
                 leaveRequest.StatusId = (byte)LeaveRequestStatusEnum.Pending;
+                leaveRequest.RequestDate = DateTime.UtcNow;
                 leaveRequest.ComputeTotalDays();
                 employee.LeaveRequests.Add(leaveRequest);
 
@@ -45,6 +46,7 @@ namespace Elias.DAL.Migrations
                 leaveRequest.FromDate = new DateTime(DateTime.UtcNow.Year, 3, 1);
                 leaveRequest.ToDate = leaveRequest.FromDate.AddDays(5);
                 leaveRequest.StatusId = (byte)LeaveRequestStatusEnum.Pending;
+                leaveRequest.RequestDate = DateTime.UtcNow;
                 leaveRequest.ComputeTotalDays();
                 employee.LeaveRequests.Add(leaveRequest);
             }

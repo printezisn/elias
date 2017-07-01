@@ -18,5 +18,7 @@ namespace Elias.DAL.Repository
         User GetUser(string username);
 
         SCIPagedList<Employee> GetPagedEmployees(int page, int pageSize, string searchTerm, string sortBy, bool isAsc = true);
+
+        SCIPagedList<LeaveRequest> GetPagedLeaveRequests(int page, int pageSize, string searchTerm, string sortBy, bool isAsc = true);
     }
 }

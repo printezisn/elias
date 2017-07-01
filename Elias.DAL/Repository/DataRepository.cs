@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Elias.Shared.Extensions;
+using System.Data.Entity;
 
 namespace Elias.DAL.Repository
 {
@@ -27,6 +28,17 @@ namespace Elias.DAL.Repository
             query = query.OrderBy(sortBy, isAsc).ThenBy(o => o.Id);
 
             return new SCIPagedList<Employee>(query, page, pageSize, searchTerm, sortBy, isAsc);
+        }
+
+        public SCIPagedList<LeaveRequest> GetPagedLeaveRequests(int page, int pageSize, string searchTerm, string sortBy, bool isAsc = true)
+        {
+            var query = Db.LeaveRequests.Include(i => i.Employee).Include(i => i.Status);
+            query = string.IsNullOrWhiteSpace(searchTerm)
+                ? query
+                : query.Where(w => (w.Employee.FirstName + " " + w.Employee.LastName).Contains(searchTerm));
+            query = query.OrderBy(sortBy, isAsc).ThenBy(o => o.Id);
+
+            return new SCIPagedList<LeaveRequest>(query, page, pageSize, searchTerm, sortBy, isAsc);
         }
     }
 }

@@ -174,6 +174,7 @@
     <Compile Include="Code\AppConstants.cs" />
     <Compile Include="Code\AppGlobalMessages.cs" />
     <Compile Include="Code\Attributes\SCIAuthorizeAttribute.cs" />
+    <Compile Include="Code\DateHelper.cs" />
     <Compile Include="Code\EmployeeHelper.cs" />
     <Compile Include="Code\Extensions\Html.Extensions.cs" />
     <Compile Include="Code\SCIModelBinder.cs" />
@@ -183,6 +184,7 @@
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\EmployeesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\LeaveRequestsController.cs" />
     <Compile Include="Controllers\MessagesController.cs" />
     <Compile Include="Dialogs\LUISDialog.cs" />
     <Compile Include="Dialogs\RootDialog.cs" />
@@ -220,6 +222,8 @@
     <Content Include="Views\Employees\Edit.cshtml" />
     <Content Include="Views\Employees\Index.cshtml" />
     <Content Include="Views\Employees\Grid.cshtml" />
+    <Content Include="Views\LeaveRequests\Index.cshtml" />
+    <Content Include="Views\LeaveRequests\Grid.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

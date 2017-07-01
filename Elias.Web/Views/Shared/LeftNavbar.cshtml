@@ -13,4 +13,7 @@
     <li class="@((controller == "employees") ? "active" : string.Empty)">
         <a href="@Url.Action("index", "employees")">Employees</a>
     </li>
+    <li class="@((controller == "leaverequests") ? "active" : string.Empty)">
+        <a href="@Url.Action("index", "leaverequests")">Leave Requests</a>
+    </li>
 </ul>
