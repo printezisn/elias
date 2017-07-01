@@ -14,6 +14,7 @@ using Elias.Web.Code;
 using Elias.Web.Models;
 using Elias.Web.Models.Enums;
 using Elias.DAL.Enums;
+using Elias.Web.Hubs;
 
 namespace Elias.Web.Controllers
 {
@@ -89,6 +90,8 @@ namespace Elias.Web.Controllers
                 leaveRequest.StatusId = (byte)LeaveRequestStatusEnum.Accepted;
                 _db.Save();
 
+                NotificationHub.UpdateLeaveRequests();
+
                 // TODO: Send message to employee
 
                 return Json(new { Message = new ToastrMessage(null, "The leave request was accepted successfully!", ToastrMessageTypeEnum.Success) });
@@ -119,6 +122,8 @@ namespace Elias.Web.Controllers
                 leaveRequest.StatusId = (byte)LeaveRequestStatusEnum.Rejected;
                 _db.Save();
 
+                NotificationHub.UpdateLeaveRequests();
+
                 // TODO: Send message to employee
 
                 return Json(new { Message = new ToastrMessage(null, "The leave request was rejected successfully!", ToastrMessageTypeEnum.Success) });
@@ -127,6 +132,16 @@ namespace Elias.Web.Controllers
             {
                 return Json(new { Message = new ToastrMessage(null, AppGlobalMessages.UnexpectedErrorMessage, ToastrMessageTypeEnum.Error) });
             }
+        }
+
+        public JsonResult TotalLeaveRequests()
+        {
+            var date = new DateTime(DateTime.UtcNow.Year, 1, 1);
+
+            int total = _db.GetLeaveRequests()
+                .Count(c => c.StatusId == (byte)LeaveRequestStatusEnum.Pending && c.FromDate >= date && date <= c.ToDate);
+
+            return Json(total, JsonRequestBehavior.AllowGet);
         }
 
         #endregion

@@ -36,6 +36,13 @@
         var useCommaForDecimals = @(2.01.ToString().Contains(',') ? "true" : "false");
     </script>
     <script src="@Html.JsLink("site")"></script>
+    <script src="~/signalr/hubs"></script>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <script>
+            ELApp.user = '@ViewBag.User.Username';
+        </script>
+    }
     @Html.Partial("AppMessages")
     @RenderSection("Scripts", false)
 </body>
