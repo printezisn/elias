@@ -1,4 +1,7 @@
-﻿using Microsoft.Bot.Builder.Dialogs;
+﻿using Elias.DAL.Entities;
+using Elias.DAL.Repository;
+using Elias.Web.Code;
+using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Luis;
 using Microsoft.Bot.Builder.Luis.Models;
 using Microsoft.Bot.Connector;
@@ -14,6 +17,7 @@ namespace Elias.Web.Dialogs
     [Serializable]
     public class LUISDialog : LuisDialog<object>
     {
+       
         #region Intents
         [LuisIntent("")]
         [LuisIntent("None")]
@@ -55,7 +59,20 @@ namespace Elias.Web.Dialogs
         [LuisIntent("RequestRemaining")]
         public async Task RequestRemaining(IDialogContext context, LuisResult result)
         {
-            await context.PostAsync($"request remaining");
+            using (var db = new DataRepository())
+            {
+                var employee = db.GetEmployees(false).FirstOrDefault(e => e.SkypeId == context.Activity.From.Id);
+                if (employee != null)
+                {
+                    EmployeeHelper.SetReservedDays(db, employee);
+                    int daysRemaining = employee.LeaveDays - employee.ReservedDays > 0 ? employee.LeaveDays - employee.ReservedDays : 0;
+                    await context.PostAsync($"You have {daysRemaining}. Don't spend them all at once ;)");
+                }
+                else
+                {
+                    await context.PostAsync("I don't know you. I am sorry, don't bother me I have a boyfriend.");
+                }
+            }
         }
        
         #endregion

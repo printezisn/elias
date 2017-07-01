@@ -20,7 +20,6 @@ namespace Elias.Web
         {
             if (activity.Type == ActivityTypes.Message)
             {
-                LUISDialog luisDialog = new LUISDialog();
                 await Conversation.SendAsync(activity, () => new LUISDialog());
 
                // await Conversation.SendAsync(activity, () => new Dialogs.RootDialog());
