@@ -18,6 +18,7 @@ namespace Elias.Web
         {
             if (activity.Type == ActivityTypes.Message)
             {
+                System.Diagnostics.Debug.WriteLine("kajsdjahsdkasdha");
                 await Conversation.SendAsync(activity, () => new Dialogs.RootDialog());
             }
             else
