@@ -22,6 +22,10 @@ namespace Elias.DAL.Migrations
                 new LeaveRequestStatus() { Id = 3, Name = "Rejected" }
             );
 
+            context.Employees.AddOrUpdate(
+                new Employee() { FirstName = "Panagiotis", LastName = "Bakos", Email = "panbac88@hotmail.com", LeaveDays = 22, SkypeId = "default-user" }
+            );
+
             string passwordSalt;
             string password = PasswordHelper.HashPassword("1234", out passwordSalt);
 

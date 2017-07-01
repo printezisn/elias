@@ -105,6 +105,15 @@ namespace Elias.Web.Controllers
         {
             try
             {
+                if (model != null && !string.IsNullOrWhiteSpace(model.SkypeId) && _db.GetEmployees().Any(a => a.SkypeId == model.SkypeId))
+                {
+                    this.AddModelError<Employee, string>(m => m.SkypeId, "The Skype ID you entered is already used.");
+                }
+                if (model != null && !string.IsNullOrWhiteSpace(model.FacebookId) && _db.GetEmployees().Any(a => a.FacebookId == model.FacebookId))
+                {
+                    this.AddModelError<Employee, string>(m => m.SkypeId, "The Facebook ID you entered is already used.");
+                }
+
                 if (!ModelState.IsValid)
                 {
                     return View(model);
@@ -164,6 +173,15 @@ namespace Elias.Web.Controllers
 
             try
             {
+                if (model != null && !string.IsNullOrWhiteSpace(model.SkypeId) && model.SkypeId != entity.SkypeId && _db.GetEmployees().Any(a => a.SkypeId == model.SkypeId))
+                {
+                    this.AddModelError<Employee, string>(m => m.SkypeId, "The Skype ID you entered is already used.");
+                }
+                if (model != null && !string.IsNullOrWhiteSpace(model.FacebookId) && model.FacebookId != entity.FacebookId && _db.GetEmployees().Any(a => a.FacebookId == model.FacebookId))
+                {
+                    this.AddModelError<Employee, string>(m => m.SkypeId, "The Facebook ID you entered is already used.");
+                }
+
                 if (!ModelState.IsValid)
                 {
                     return View(entity);
