@@ -170,6 +170,13 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\build\img\fontawesome-webfont.svg" />
+    <Content Include="Content\build\img\glyphicons-halflings-regular.svg" />
+    <Content Include="Content\build\img\sort_asc.png" />
+    <Content Include="Content\build\img\sort_both.png" />
+    <Content Include="Content\build\img\sort_desc.png" />
+    <Content Include="Content\build\site-1ff8ada113bdf43b9a1a.min.css" />
+    <Content Include="Content\build\site-1ff8ada113bdf43b9a1a.min.js" />
     <Content Include="Content\img\sort_asc.png" />
     <Content Include="Content\img\sort_both.png" />
     <Content Include="Content\img\sort_desc.png" />
@@ -253,6 +260,15 @@
     <Content Include="Views\LeaveRequests\Modals\Accept.cshtml" />
     <Content Include="Views\LeaveRequests\Modals\Reject.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Content\build\fonts\fontawesome-webfont.eot" />
+    <Content Include="Content\build\fonts\fontawesome-webfont.ttf" />
+    <Content Include="Content\build\fonts\fontawesome-webfont.woff" />
+    <Content Include="Content\build\fonts\fontawesome-webfont.woff2" />
+    <Content Include="Content\build\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="Content\build\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="Content\build\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="Content\build\fonts\glyphicons-halflings-regular.woff2" />
+    <Content Include="Content\build\site-1ff8ada113bdf43b9a1a.min.js.LICENSE" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -271,9 +287,7 @@
       <Name>Elias.Shared</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Content\build\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
