@@ -18,7 +18,7 @@ namespace Elias.Web.Code
                     .Where(w =>
                         w.EmployeeId == employee.Id &&
                         w.StatusId == (byte)LeaveRequestStatusEnum.Accepted &&
-                        w.FromDate <= date && date <= w.ToDate
+                        w.FromDate >= date && date <= w.ToDate
                     )
                     .Sum(sum => (int?)sum.TotalDays) ?? 0;
         }
