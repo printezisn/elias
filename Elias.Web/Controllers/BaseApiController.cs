@@ -11,6 +11,13 @@ namespace Elias.Web.Controllers
     {
         protected IDataRepository _db;
 
+        protected override void Dispose(bool disposing)
+        {
+            _db.Dispose();
+
+            base.Dispose(disposing);
+        }
+
         public BaseApiController()
         {
             _db = new DataRepository();
