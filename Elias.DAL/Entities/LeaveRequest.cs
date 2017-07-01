@@ -38,5 +38,21 @@ namespace Elias.DAL.Entities
         public virtual LeaveRequestStatus Status { get; set; }
 
         #endregion
+
+        #region Custom Methods
+
+        public void ComputeTotalDays()
+        {
+            this.TotalDays = 0;
+            for (var date = this.FromDate; date <= this.ToDate; date = date.AddDays(1))
+            {
+                if (date.DayOfWeek != DayOfWeek.Saturday && date.DayOfWeek != DayOfWeek.Sunday)
+                {
+                    this.TotalDays++;
+                }
+            }
+        }
+
+        #endregion
     }
 }

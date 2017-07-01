@@ -1,4 +1,5 @@
 ﻿using Elias.DAL.Entities;
+using Elias.DAL.Enums;
 using Elias.DAL.Repository;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,11 @@ namespace Elias.Web.Code
             var date = new DateTime(DateTime.UtcNow.Year, 1, 1);
 
             employee.ReservedDays = db.GetLeaveRequests()
-                    .Where(w => w.EmployeeId == employee.Id && w.FromDate <= date && date <= w.ToDate)
+                    .Where(w =>
+                        w.EmployeeId == employee.Id &&
+                        w.StatusId == (byte)LeaveRequestStatusEnum.Accepted &&
+                        w.FromDate <= date && date <= w.ToDate
+                    )
                     .Sum(sum => (int?)sum.TotalDays) ?? 0;
         }
     }
