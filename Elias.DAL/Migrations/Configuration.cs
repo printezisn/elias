@@ -23,6 +23,7 @@ namespace Elias.DAL.Migrations
             );
 
             context.Employees.AddOrUpdate(
+                r => r.SkypeId,
                 new Employee() { FirstName = "Panagiotis", LastName = "Bakos", Email = "panbac88@hotmail.com", LeaveDays = 22, SkypeId = "default-user" }
             );
 
