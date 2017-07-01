@@ -1220,6 +1220,10 @@ expand-range@^1.8.1:
   dependencies:
     fill-range "^2.1.0"
 
+expose-loader@^0.7.3:
+  version "0.7.3"
+  resolved "https://registry.yarnpkg.com/expose-loader/-/expose-loader-0.7.3.tgz#35fbd3659789e4faa81f59de8b7e9fc39e466d51"
+
 extend@~3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/extend/-/extend-3.0.1.tgz#a755ea7bc1adfcc5a31ce7e762dbaadc5e636444"
@@ -1738,7 +1742,7 @@ jquery-validation@>=1.8, jquery-validation@^1.16.0:
   dependencies:
     jquery "^1.7 || ^2.0 || ^3.1"
 
-"jquery@2 - 3", jquery@>=1.8, "jquery@^1.7 || ^2.0 || ^3.1", jquery@^3.2.1:
+"jquery@2 - 3", jquery@>=1.6.4, jquery@>=1.8, "jquery@^1.7 || ^2.0 || ^3.1", jquery@^3.2.1:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.2.1.tgz#5c4d9de652af6cd0a770154a631bba12b015c787"
 
@@ -2930,6 +2934,12 @@ shallow-clone@^0.1.2:
 signal-exit@^3.0.0:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.2.tgz#b5fdc08f1287ea1178628e415e25132b73646c6d"
+
+signalr@^2.2.2:
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/signalr/-/signalr-2.2.2.tgz#ba07915eb5e08cfbc87765047ec6972694d008e2"
+  dependencies:
+    jquery ">=1.6.4"
 
 slash@^1.0.0:
   version "1.0.0"

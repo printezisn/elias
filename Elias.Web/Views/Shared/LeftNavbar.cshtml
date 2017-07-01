@@ -14,6 +14,9 @@
         <a href="@Url.Action("index", "employees")">Employees</a>
     </li>
     <li class="@((controller == "leaverequests") ? "active" : string.Empty)">
-        <a href="@Url.Action("index", "leaverequests")">Leave Requests</a>
+        <a href="@Url.Action("index", "leaverequests")">
+            Leave Requests
+            <span class="badge leave-requests-badge" style="display: none">0</span>
+        </a>
     </li>
 </ul>

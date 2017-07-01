@@ -5,6 +5,7 @@ let grids = [];
 export class ELApp {
     constructor() {
         this.culture = 'en';
+        this.user = '';
     }
 
     showNotification(msg) {
@@ -30,6 +31,27 @@ export class ELApp {
         window.location = urlManager.combine();
 
         return false;
+    }
+
+    loadTotalLeaveRequests() {
+        if(!this.user) {
+            return;
+        }
+
+        $.ajax({
+            url: '/LeaveRequests/TotalLeaveRequests',
+            type: 'GET',
+            dataType: 'json',
+            success: function(total) {
+                $('.leave-requests-badge').html(total);
+                if(total == 0) {
+                    $('.leave-requests-badge').hide();
+                }
+                else {
+                    $('.leave-requests-badge').show();
+                }
+            }
+        });
     }
 }
 
@@ -289,4 +311,12 @@ $(function() {
     if ($.fn.datepicker) {
         $('.sci-date-picker').datepicker({ format: 'dd.mm.yyyy' });
     }
+
+    $.connection.notificationHub.client.updateLeaveRequests = () => {
+        window.ELApp.loadTotalLeaveRequests();
+    };
+
+    $.connection.hub.start();
+
+    window.ELApp.loadTotalLeaveRequests();
 });
