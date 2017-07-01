@@ -1,0 +1,17 @@
+packages
+.vs
+
+Elias.Web/bin
+Elias.Web/obj
+Elias.Web/Elias.Web.csproj.user
+Elias.Web/node_modules
+Elias.Web/Content/build
+Elias.Web/Properties/PublishProfiles/*.user
+
+Elias.Shared/bin
+Elias.Shared/obj
+Elias.Shared/Brain.Shared.csproj.user
+
+Elias.DAL/bin
+Elias.DAL/obj
+Elias.DAL/Elias.DAL.csproj.user
