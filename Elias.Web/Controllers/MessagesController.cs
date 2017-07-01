@@ -5,6 +5,7 @@ using System.Web.Http;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 using Elias.Web.Controllers;
+using Elias.Web.Dialogs;
 
 namespace Elias.Web
 {
@@ -19,8 +20,10 @@ namespace Elias.Web
         {
             if (activity.Type == ActivityTypes.Message)
             {
-                System.Diagnostics.Debug.WriteLine("kajsdjahsdkasdha");
-                await Conversation.SendAsync(activity, () => new Dialogs.RootDialog());
+                LUISDialog luisDialog = new LUISDialog();
+                await Conversation.SendAsync(activity, () => new LUISDialog());
+
+               // await Conversation.SendAsync(activity, () => new Dialogs.RootDialog());
             }
             else
             {
