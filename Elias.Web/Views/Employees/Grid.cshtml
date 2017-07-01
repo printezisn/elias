@@ -1,0 +1,49 @@
+﻿@model SCIPagedList<Elias.DAL.Entities.Employee>
+
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover dataTable gray-table">
+        <thead>
+            <tr>
+                @Html.SCISortHeader(Html.DisplayNameFor(model => model.FirstOrDefault().LastName), "lastname", Model.SortBy, Model.IsAscendingOrder)
+                @Html.SCISortHeader(Html.DisplayNameFor(model => model.FirstOrDefault().FirstName), "firstname", Model.SortBy, Model.IsAscendingOrder)
+                @Html.SCISortHeader(Html.DisplayNameFor(model => model.FirstOrDefault().Email), "email", Model.SortBy, Model.IsAscendingOrder)
+                @Html.SCISortHeader(Html.DisplayNameFor(model => model.FirstOrDefault().LeaveDays), "leavedays", Model.SortBy, Model.IsAscendingOrder)
+                <th>@Html.DisplayNameFor(model => model.FirstOrDefault().ReservedDays)</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FirstName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LastName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Email)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LeaveDays)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ReservedDays)
+                    </td>
+                    <td>
+                        <a href="@Url.Action("edit", new { id = item.Id, returnUrl = Request.Url.PathAndQuery })" class="btn btn-xs btn-success">Edit</a>
+                        <a href="@Url.Action("details", new { id = item.Id, returnUrl = Request.Url.PathAndQuery })" class="btn btn-xs btn-primary">Details</a>
+                        <a href="@Url.Action("delete", new { id = item.Id, returnUrl = Request.Url.PathAndQuery })" class="btn btn-xs btn-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (Model.Any())
+{
+    @Html.Partial("Pager", Model)
+}

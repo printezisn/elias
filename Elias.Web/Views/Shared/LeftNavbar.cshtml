@@ -10,4 +10,7 @@
     <li class="@((page == "home-index") ? "active" : string.Empty)">
         <a href="@Url.Action("index", "home")">Dashboard</a>
     </li>
+    <li class="@((controller == "employees") ? "active" : string.Empty)">
+        <a href="@Url.Action("index", "employees")">Employees</a>
+    </li>
 </ul>

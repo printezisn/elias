@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -46,6 +47,14 @@ namespace Elias.DAL.Entities
 
         [SCIMaxLength(1024)]
         public string ServiceUrl { get; set; }
+
+        #region Custom Properties
+
+        [NotMapped]
+        [DisplayName("Reserved Days")]
+        public int ReservedDays { get; set; }
+
+        #endregion
 
         #region Navigation Properties
 

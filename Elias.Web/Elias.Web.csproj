@@ -174,12 +174,14 @@
     <Compile Include="Code\AppConstants.cs" />
     <Compile Include="Code\AppGlobalMessages.cs" />
     <Compile Include="Code\Attributes\SCIAuthorizeAttribute.cs" />
+    <Compile Include="Code\EmployeeHelper.cs" />
     <Compile Include="Code\Extensions\Html.Extensions.cs" />
     <Compile Include="Code\SCIModelBinder.cs" />
     <Compile Include="Code\SCIViewEngine.cs" />
     <Compile Include="Controllers\AuthController.cs" />
     <Compile Include="Controllers\BaseApiController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
+    <Compile Include="Controllers\EmployeesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MessagesController.cs" />
     <Compile Include="Dialogs\LUISDialog.cs" />
@@ -212,6 +214,12 @@
     <Content Include="Views\Shared\TopNavbar.cshtml" />
     <Content Include="Views\Shared\LeftNavbar.cshtml" />
     <Content Include="Content\sass\imports\_dashboard.scss" />
+    <Content Include="Views\Employees\Create.cshtml" />
+    <Content Include="Views\Employees\Delete.cshtml" />
+    <Content Include="Views\Employees\Details.cshtml" />
+    <Content Include="Views\Employees\Edit.cshtml" />
+    <Content Include="Views\Employees\Index.cshtml" />
+    <Content Include="Views\Employees\Grid.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

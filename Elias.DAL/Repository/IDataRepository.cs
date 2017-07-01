@@ -1,4 +1,5 @@
 ﻿using Elias.DAL.Entities;
+using Elias.Shared.Collections;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,5 +16,7 @@ namespace Elias.DAL.Repository
         /// <param name="username">The username of the user</param>
         /// <returns>The user entity or null if it doesn't exist</returns>
         User GetUser(string username);
+
+        SCIPagedList<Employee> GetPagedEmployees(int page, int pageSize, string searchTerm, string sortBy, bool isAsc = true);
     }
 }
