@@ -1,0 +1,188 @@
+﻿<#@ template language="C#" HostSpecific="True" #>
+<#@ assembly name="System.Data.Entity.Design" #>
+<#@ import namespace="System.Data.Entity.Design.PluralizationServices" #>
+<#@ output extension=".cshtml" #>
+<#@ include file="Imports.include.t4" #>
+@model <#= ViewDataTypeName #>
+<#
+
+int index = ViewDataTypeName.LastIndexOf('.');
+string entityName = ViewDataTypeName.Substring(index + 1);
+
+PluralizationService ps = PluralizationService.CreateService(System.Globalization.CultureInfo.GetCultureInfo("en-us"));
+string entityNamePlural = ps.Pluralize(entityName);
+
+// The following chained if-statement outputs the file header code and markup for a partial view, a view using a layout page, or a regular view.
+if(IsPartialView) {
+#>
+
+<#
+} else if(IsLayoutPageSelected) {
+#>
+
+@{
+    ViewBag.Title = "Delete <#= entityName #>";
+<#
+if (!String.IsNullOrEmpty(LayoutPageFile)) {
+#>
+    Layout = "<#= LayoutPageFile#>";
+<#
+}
+#>
+}
+
+@section Breadcrumb {
+    <ul class="breadcrumb">
+		<li>
+			<a href="@Url.Action("index", "home")">Dashboard</a>
+		</li>
+		<li>
+			<a href="@Url.Action("index")"><#= entityNamePlural #></a>
+		</li>
+        <li class="active">
+            <span>@ViewBag.Title (@Model.Name)</span>
+        </li>
+    </ul>
+}
+
+<h3 class="page-title">
+	@ViewBag.Title
+	<small>@Model.Name</small>
+</h3>
+<hr />
+<br />
+
+<#
+} else {
+#>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+</head>
+<body>
+<#
+    PushIndent("    ");
+}
+#>
+<div class="form form-horizontal">
+    <div class="form-body">
+<#
+foreach (PropertyMetadata property in ModelMetadata.Properties) {
+    if (property.Scaffold && !property.IsPrimaryKey && !property.IsForeignKey) {
+#>
+<#
+		if(property.PropertyName == "IsDeleted")
+		{
+			continue;
+		}
+
+        // We do not want to show any association properties for which there is
+        // no associated foreign key.
+        if (property.IsAssociation && GetRelatedModelMetadata(property) == null) {
+            continue;
+        }
+#>
+		<div class="form-group">
+<#
+		if(property.PropertyName == "CreatedByUser")
+		{
+#>
+			@Html.SCILabelFor(model => model.CreatedByUserId, new { @class = "control-label col-md-3" }, true)
+<#
+		}
+		else if(property.PropertyName == "UpdatedByUser")
+		{
+#>
+			@Html.SCILabelFor(model => model.UpdatedByUserId, new { @class = "control-label col-md-3" }, true)
+<#
+		}
+		else
+		{
+#>
+			@Html.SCILabelFor(model => model.<#= property.PropertyName #>, new { @class = "control-label col-md-3" }, true)
+<#
+		}
+#>
+			<div class="col-md-4">
+				<p class="form-control-static">
+<#
+		if(property.PropertyName == "CreatedByUser")
+		{
+#>
+					@Html.DisplayFor(model => model.CreatedByUser.Username)
+<#
+		}
+		else if(property.PropertyName == "UpdatedByUser")
+		{
+#>
+					@Html.DisplayFor(model => model.UpdatedByUser.Username)
+<#
+		}
+		else if(property.TypeName == "System.DateTime" || property.TypeName == "Nullable<System.DateTime>")
+		{
+#>
+					@Html.RenderDateTime(<#= "Model." + GetValueExpression(property) #>)
+<#
+		}
+		else if(property.TypeName == "System.Boolean")
+		{
+#>
+					@Html.CheckBoxFor(model => <#= "model." + GetValueExpression(property) #>, new { disabled = "disabled" })
+<#
+		}
+		else
+		{
+#>
+					@Html.DisplayFor(model => <#= "model." + GetValueExpression(property) #>)
+<#
+		}
+#>
+				</p>
+			</div>
+		</div>
+
+<#
+    }
+}
+#>
+    </div>
+    @using (Html.BeginForm())
+	{
+        @Html.AntiForgeryToken()
+		<input type="hidden" name="returnUrl" value="@Html.ReturnUrl(Url.Action("index"))" />
+
+		<div class="row">
+			<div class="col-md-offset-3 col-md-9">
+				<a href="@Html.ReturnUrl(Url.Action("index"))" class="btn btn-default">
+					<i class="fa fa-long-arrow-left"></i>
+					Back to List
+				</a>
+				<button type="submit" class="btn btn-danger">
+					Confirm Deletion
+					<i class="fa fa-remove"></i>
+				</button>
+			</div>
+		</div>
+    }
+</div>
+<#
+// The following code closes the tag used in the case of a view using a layout page and the body and html tags in the case of a regular view page
+#>
+<#
+if(!IsPartialView && !IsLayoutPageSelected) {
+    ClearIndent();
+#>
+</body>
+</html>
+<#
+}
+#>
+<#@ include file="ModelMetadataFunctions.cs.include.t4" #>

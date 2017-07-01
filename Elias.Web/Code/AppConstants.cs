@@ -11,5 +11,6 @@ namespace Elias.Web.Code
         public const string PAGE_ERRORS_TEMPDATA_KEY = "PageErrors";
         public const string APP_MESSAGES_TEMPDATA_KEY = "AppMessages";
         public const string ASSETS_CACHE_KEY = "Assets";
+        public const string HTTP_CONTEXT_ITEMS_USER_SESSION_KEY = "UserSession";
     }
 }

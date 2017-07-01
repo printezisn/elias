@@ -1,0 +1,35 @@
+﻿@model ModelStateDictionary
+
+@{
+    var errors = TempData[AppConstants.PAGE_ERRORS_TEMPDATA_KEY] as List<string>;
+    if (errors == null)
+    {
+        errors = new List<string>();
+    }
+
+    if (!Model.IsValid)
+    {
+        foreach (var property in Model)
+        {
+            foreach (var error in property.Value.Errors)
+            {
+                errors.Add(error.ErrorMessage);
+            }
+        }
+    }
+}
+
+@if (errors.Any())
+{
+    <div class="alert alert-danger alert-dismissible fade in" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <ul>
+            @foreach (var error in errors)
+            {
+                <li>@error</li>
+            }
+        </ul>
+    </div>
+}

@@ -1,0 +1,195 @@
+﻿<#@ template language="C#" HostSpecific="True" #>
+<#@ assembly name="System.Data.Entity.Design" #>
+<#@ import namespace="System.Data.Entity.Design.PluralizationServices" #>
+<#@ output extension=".cshtml" #>
+<#@ include file="Imports.include.t4" #>
+@model SCIPagedList<#= "<" + ViewDataTypeName + ">" #>
+<#
+
+int index = ViewDataTypeName.LastIndexOf('.');
+string entityName = ViewDataTypeName.Substring(index + 1);
+
+PluralizationService ps = PluralizationService.CreateService(System.Globalization.CultureInfo.GetCultureInfo("en-us"));
+string entityNamePlural = ps.Pluralize(entityName);
+
+// The following chained if-statement outputs the file header code and markup for a partial view, a view using a layout page, or a regular view.
+if(IsPartialView) {
+#>
+
+
+<#
+} else if(IsLayoutPageSelected) {
+#>
+
+@{
+    ViewBag.Title = "<#= ViewName #> <#= entityName.ToLower() #>";
+<#
+if (!String.IsNullOrEmpty(LayoutPageFile)) {
+#>
+    Layout = "<#= LayoutPageFile#>";
+<#
+}
+#>
+}
+
+<h2>@ViewBag.Title</h2>
+
+<#
+} else {
+#>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+</head>
+<body>
+<#
+    PushIndent("    ");
+}
+#>
+<div class="table-responsive">
+<table class="table table-bordered table-hover dataTable gray-table">
+	<thead>
+    <tr>
+<#
+IEnumerable<PropertyMetadata> properties = ModelMetadata.Properties;
+foreach (PropertyMetadata property in properties) {
+    if (property.Scaffold && !property.IsPrimaryKey && !property.IsForeignKey) {
+#>
+<#
+		if(property.PropertyName == "IsDeleted")
+		{
+			continue;
+		}
+
+        // We do not want to show any association properties for which there is
+        // no associated foreign key.
+        if (property.IsAssociation && GetRelatedModelMetadata(property) == null) {
+            continue;
+        }
+
+		if(property.PropertyName == "CreatedByUser")
+		{
+#>
+		@Html.SCISortHeader(Html.DisplayNameFor(model => model.FirstOrDefault().CreatedByUserId), "createdby", Model.SortBy, Model.IsAscendingOrder)
+<#
+		}
+		else if(property.PropertyName == "UpdatedByUser")
+		{
+#>
+		@Html.SCISortHeader(Html.DisplayNameFor(model => model.FirstOrDefault().UpdatedByUserId), "updatedby", Model.SortBy, Model.IsAscendingOrder)
+<#
+		}
+		else
+		{
+#>
+        @Html.SCISortHeader(Html.DisplayNameFor(model => model.FirstOrDefault().<#= GetValueExpression(property) #>), "<#= GetValueExpression(property).ToLower() #>", Model.SortBy, Model.IsAscendingOrder)
+<#
+		}
+    }
+}
+#>
+        <th></th>
+    </tr>
+	</thead>
+	<tbody>
+@foreach (var item in Model) {
+    <tr>
+<#
+foreach (PropertyMetadata property in properties) {
+    if (property.Scaffold && !property.IsPrimaryKey && !property.IsForeignKey) {
+#>
+<#
+		if(property.PropertyName == "IsDeleted")
+		{
+			continue;
+		}
+
+        // We do not want to show any association properties for which there is
+        // no associated foreign key.
+        if (property.IsAssociation && GetRelatedModelMetadata(property) == null) {
+            continue;
+        }
+#>
+        <td>
+<#
+		if(property.PropertyName == "CreatedByUser")
+		{
+#>
+			@Html.DisplayFor(modelItem => item.CreatedByUser.Username)
+<#
+		}
+		else if(property.PropertyName == "UpdatedByUser")
+		{
+#>
+			@Html.DisplayFor(modelItem => item.UpdatedByUser.Username)
+<#
+		}
+		else if(property.TypeName == "System.DateTime" || property.TypeName == "Nullable<System.DateTime>")
+		{
+#>
+			@Html.RenderDateTime(<#= "item." + GetValueExpression(property) #>)
+<#
+		}
+		else
+		{
+#>
+            @Html.DisplayFor(modelItem => <#= "item." + GetValueExpression(property) #>)
+<#
+		}
+#>
+        </td>
+<#
+    }
+}
+
+string pkName = GetPrimaryKeyName();
+if (pkName != null) {
+#>
+        <td>
+			<a href="@Url.Action("edit", new { id = item.<#= pkName #>, returnUrl = Request.Url.PathAndQuery })" class="btn btn-xs btn-success">Edit</a>
+			<a href="@Url.Action("details", new { id = item.<#= pkName #>, returnUrl = Request.Url.PathAndQuery })" class="btn btn-xs btn-primary">Details</a>
+			<a href="@Url.Action("delete", new { id = item.<#= pkName #>, returnUrl = Request.Url.PathAndQuery })" class="btn btn-xs btn-danger">Delete</a>
+        </td>
+<#
+} else {
+#>
+        <td>
+			<a href="@Url.Action("edit", new { /*id=item.<#= pkName #>*/ })" class="btn btn-xs btn-success">Edit</a>
+			<a href="@Url.Action("details", new { /*id=item.<#= pkName #>*/ })" class="btn btn-xs btn-primary">Details</a>
+			<a href="@Url.Action("delete", new { /*id=item.<#= pkName #>*/ })" class="btn btn-xs btn-danger">Delete</a>
+        </td>
+<#
+}
+#>
+    </tr>
+}
+</tbody>
+</table>
+</div>
+
+@if(Model.Any())
+{
+    @Html.Partial("Pager", Model)
+}
+
+<#
+// The following code closes the tag used in the case of a view using a layout page and the body and html tags in the case of a regular view page
+#>
+<#
+if(!IsPartialView && !IsLayoutPageSelected) {
+    ClearIndent();
+#>
+</body>
+</html>
+<#
+}
+#>
+<#@ include file="ModelMetadataFunctions.cs.include.t4" #>

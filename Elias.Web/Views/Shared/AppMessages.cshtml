@@ -1,0 +1,15 @@
+﻿@{
+    var messages = (List<Elias.Web.Models.ToastrMessage>)TempData[AppConstants.APP_MESSAGES_TEMPDATA_KEY];
+}
+
+@if (messages != null && messages.Any())
+{
+    <script>
+        $(function() {
+            @foreach(var message in messages)
+            {
+                <text>ELApp.showNotification({ Message: '@message.Message', Title: '@message.Title', Type: @((int)message.Type) });</text>
+            }
+        });
+    </script>
+}

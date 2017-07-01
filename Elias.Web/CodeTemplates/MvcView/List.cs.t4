@@ -1,0 +1,110 @@
+﻿<#@ template language="C#" HostSpecific="True" #>
+<#@ assembly name="System.Data.Entity.Design" #>
+<#@ import namespace="System.Data.Entity.Design.PluralizationServices" #>
+<#@ output extension=".cshtml" #>
+<#@ include file="Imports.include.t4" #>
+@model SCIPagedList<#= "<" + ViewDataTypeName + ">" #>
+<#
+
+int index = ViewDataTypeName.LastIndexOf('.');
+string entityName = ViewDataTypeName.Substring(index + 1);
+
+PluralizationService ps = PluralizationService.CreateService(System.Globalization.CultureInfo.GetCultureInfo("en-us"));
+string entityNamePlural = ps.Pluralize(entityName);
+
+// The following chained if-statement outputs the file header code and markup for a partial view, a view using a layout page, or a regular view.
+if(IsPartialView) {
+#>
+
+<#
+} else if(IsLayoutPageSelected) {
+#>
+
+@{
+    ViewBag.Title = "<#= entityNamePlural #>";
+<#
+if (!String.IsNullOrEmpty(LayoutPageFile)) {
+#>
+    Layout = "<#= LayoutPageFile #>";
+<#
+}
+#>
+}
+
+@section Breadcrumb {
+    <ul class="breadcrumb">
+		<li>
+			<a href="@Url.Action("index", "home")">Home</a>
+		</li>
+        <li class="active">
+            <span>@ViewBag.Title</span>
+        </li>
+    </ul>
+}
+
+<h3>@ViewBag.Title</h3>
+
+<#
+} else {
+#>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+</head>
+<body>
+<#
+    PushIndent("    ");
+}
+#>
+<hr />
+<br />
+
+<div class="row">
+	<div class="col-sm-6">
+		<a href="@Url.Action("create")" onclick="return BSApp.addReturnUrl('@Url.Action("create")')" class="btn btn-success">
+			Create New
+			<i class="fa fa-plus"></i>
+		</a>
+	</div>
+	<br class="visible-xs" />
+	<div class="col-sm-6">
+		@using (Html.BeginForm("<#= ViewName.ToLower() #>", "<#= entityNamePlural.ToLower() #>", FormMethod.Get))
+        {
+            <div class="input-group">
+                <input type="text" class="form-control placeholder-no-fix" name="searchTerm" value="@Model.SearchTerm" placeholder="Search...">
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </span>
+            </div>
+        }
+	</div>
+</div>
+<br />
+
+<div class="sci-ajax-grid" data-url="@Url.Action("<#= ViewName.ToLower() #>")" data-use-history>
+	@Html.Partial("Grid", Model)
+</div>
+
+<#
+// The following code closes the tag used in the case of a view using a layout page and the body and html tags in the case of a regular view page
+#>
+<#
+if(!IsPartialView && !IsLayoutPageSelected) {
+    ClearIndent();
+#>
+</body>
+</html>
+<#
+}
+#>
+<#@ include file="ModelMetadataFunctions.cs.include.t4" #>

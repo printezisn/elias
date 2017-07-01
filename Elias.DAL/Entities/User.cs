@@ -25,6 +25,10 @@ namespace Elias.DAL.Entities
         [SCIMaxLength(500)]
         public string Password { get; set; }
 
+        [SCIRequired]
+        [SCIMaxLength(500)]
+        public string PasswordSalt { get; set; }
+
         public Guid? SessionId { get; set; }
     }
 }

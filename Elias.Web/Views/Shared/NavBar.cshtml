@@ -1,0 +1,51 @@
+﻿@{
+    var user = ViewBag.User as Elias.DAL.Entities.User;
+    string controller = Request.RequestContext.RouteData.Values["controller"].ToString().ToLower();
+    string action = Request.RequestContext.RouteData.Values["action"].ToString().ToLower();
+    string page = controller + "-" + action;
+
+    string[] managePages = new string[] { "home-index" };
+}
+
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a href="@Url.Action("index", "home")" class="navbar-brand">
+                e-Lias
+            </a>
+            <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+        <div class="navbar-collapse collapse" id="navbar-main">
+            @if (user != null)
+            {
+                <ul class="nav navbar-nav">
+                    <li class="@((page == "home-index") ? "active" : string.Empty)">
+                        <a href="@Url.Action("index", "home")">Dashboard</a>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            @user.Username
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="javascript:void(0)" onclick="document.getElementById('logoutForm').submit()">Log Out</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            }
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm("logout", "auth", FormMethod.Post, new { id = "logoutForm" }))
+{
+    @Html.AntiForgeryToken()
+}

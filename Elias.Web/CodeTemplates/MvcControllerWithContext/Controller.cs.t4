@@ -1,0 +1,407 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Data.Linq" #>
+<#@ ScaffoldingAssembly Processor="ScaffoldingAssemblyLoader" #>
+<#
+string routePrefix;
+if (String.IsNullOrEmpty(AreaName)) 
+{
+    routePrefix = ControllerRootName;
+}
+else
+{
+    routePrefix = AreaName + "/" + ControllerRootName;
+}
+#>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="Microsoft.AspNet.Scaffolding.Core.Metadata" #>
+<#@ parameter type="System.String" name="ControllerName" #>
+<#@ parameter type="System.String" name="ControllerRootName" #>
+<#@ parameter type="System.String" name="Namespace" #>
+<#@ parameter type="System.String" name="AreaName" #>
+<#@ parameter type="System.String" name="ContextTypeName" #>
+<#@ parameter type="System.String" name="ModelTypeName" #>
+<#@ parameter type="System.String" name="ModelVariable" #>
+<#@ parameter type="Microsoft.AspNet.Scaffolding.Core.Metadata.ModelMetadata" name="ModelMetadata" #>
+<#@ parameter type="System.String" name="EntitySetVariable" #>
+<#@ parameter type="System.Boolean" name="UseAsync" #>
+<#@ parameter type="System.Boolean" name="IsOverpostingProtectionRequired" #>
+<#@ parameter type="System.String" name="BindAttributeIncludeText" #>
+<#@ parameter type="System.String" name ="OverpostingWarningMessage" #>
+<#@ parameter type="System.Collections.Generic.HashSet<System.String>" name="RequiredNamespaces" #>
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+<# if (UseAsync) { #>
+using System.Threading.Tasks;
+<# } #>
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using Elias.DAL.Repository;
+using Elias.Web.Code.Attributes;
+<# foreach (var namespaceName in RequiredNamespaces) { #>
+using <#= namespaceName #>;
+<# } #>
+
+namespace <#= Namespace #>
+{
+<#
+    var contextTypeName = ContextTypeName;
+    var entitySetName = ModelMetadata.EntitySetName;
+    var entitySetVar = EntitySetVariable ?? (String.IsNullOrEmpty(entitySetName) ? entitySetName : (entitySetName.Substring(0, length:1).ToLowerInvariant() + entitySetName.Substring(1)));
+    var primaryKeyName = ModelMetadata.PrimaryKeys[0].PropertyName;
+    var primaryKeyShortTypeName = ModelMetadata.PrimaryKeys[0].ShortTypeName;
+    var primaryKeyDefaultValue = ModelMetadata.PrimaryKeys[0].DefaultValue;
+    var primaryKeyType = ModelMetadata.PrimaryKeys[0].TypeName;
+    var primaryKeyNullableTypeName = GetNullableTypeName(primaryKeyType, primaryKeyShortTypeName);
+    var lambdaVar = ModelVariable[0];
+    var relatedProperties = ModelMetadata.RelatedEntities.ToDictionary(item => item.AssociationPropertyName);
+
+    string bindAttribute;
+    if (IsOverpostingProtectionRequired)
+    {
+        bindAttribute = String.Format("[Bind(Include = \"{0}\")] ", BindAttributeIncludeText);
+    }
+    else
+    {
+        bindAttribute = String.Empty;
+    }
+#>
+	[SCIAuthorize]
+    public class <#= ControllerName #> : BaseController
+    {
+		#region Fields
+
+		public Dictionary<string, string> _sortableFieldMappings = new Dictionary<string, string>()
+		{
+            ["name"] = "Name",
+            ["creationdatetime"] = "CreationDateTime",
+            ["createdby"] = "CreatedByUser.LastName",
+            ["updatedatetime"] = "UpdateDateTime",
+            ["updatedby"] = "UpdatedByUser.LastName"
+		};
+
+		#endregion
+
+		#region CRUD
+
+		/// <summary>
+        /// Renders the index page. It contains a table with all the <#= entitySetName.ToLower() #>
+        /// </summary>
+        /// <param name="page">The page to read</param>
+        /// <param name="searchTerm">The string used for search filtering</param>
+        /// <param name="sortBy">The field to sort by</param>
+        /// <param name="isAsc">Indicates if the sorting process is ascending or descending</param>
+        /// <returns>The index page view</returns>
+		[HttpGet]
+<# if (UseAsync) { #>
+        public async Task<ActionResult> Index()
+<# } else { #>
+        public ActionResult Index(int page = 1, string searchTerm = null, string sortBy = "", bool isAsc = true)
+<# } #>
+        {
+			sortBy = _sortableFieldMappings.ContainsKey(sortBy.ToLower()) ? sortBy.ToLower() : "name";
+			<# if (UseAsync) { #>
+            var collection = _db.GetPaged<#= entitySetName #>Async(page, AppConstants.DEFAULT_PAGE_SIZE, searchTerm, _sortableFieldMappings[sortBy], isAsc);
+			<# } else { #>
+			var collection = _db.GetPaged<#= entitySetName #>(page, AppConstants.DEFAULT_PAGE_SIZE, searchTerm, _sortableFieldMappings[sortBy], isAsc);
+			<# } #>
+			collection.SearchTerm = searchTerm;
+            collection.SortBy = sortBy;
+            collection.IsAscendingOrder = isAsc;
+
+            if (Request.IsAjaxRequest())
+            {
+                return PartialView("Grid", collection);
+            }
+
+            return View(collection);
+        }
+
+		/// <summary>
+        /// Renders the <#= ModelTypeName.ToLower() #> details page
+        /// </summary>
+        /// <param name="id">The id of the <#= ModelTypeName.ToLower() #></param>
+        /// <returns>The <#= ModelTypeName.ToLower() #> details page view if the <#= ModelTypeName.ToLower() #> exists, otherwise a redirect result the index page</returns>
+		[HttpGet]
+<# if (UseAsync) { #>
+        public async Task<ActionResult> Details(<#= primaryKeyShortTypeName #> id)
+<# } else { #>
+        public ActionResult Details(<#= primaryKeyShortTypeName #> id)
+<# } #>
+        {
+<# if (UseAsync) { #>
+            var model = await _db.Get<#= ModelTypeName #>Async(id);
+<# } else { #>
+            var model = _db.Get<#= ModelTypeName #>(id);
+<# } #>
+            if (model == null)
+            {
+                ShowMessage("The <#= ModelTypeName.ToLower() #> was not found.", ToastrMessageTypeEnum.Error);
+                return RedirectToAction("index");
+            }
+
+            return View(model);
+        }
+
+		/// <summary>
+        /// Renders the create <#= ModelTypeName.ToLower() #> page
+        /// </summary>
+        /// <returns>The create <#= ModelTypeName.ToLower() #> page view</returns>
+		[HttpGet]
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+<# if (IsOverpostingProtectionRequired) {
+    foreach (var line in OverpostingWarningMessage.Split(new string[] { Environment.NewLine }, StringSplitOptions.None)) { 
+#>
+        // <#= line #>
+<# } } #>
+
+		/// <summary>
+        /// Creates a new <#= ModelTypeName.ToLower() #>
+        /// </summary>
+        /// <returns>A redirect result to the details page if the operation is successful, otherwise the create <#= ModelTypeName.ToLower() #> page view</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+<# if (UseAsync) { #>
+        public async Task<ActionResult> Create(<#= bindAttribute #><#= ModelTypeName #> model)
+<# } else { #>
+        public ActionResult Create(<#= bindAttribute #><#= ModelTypeName #> model)
+<# } #>
+        {
+			try
+			{
+				if (!ModelState.IsValid)
+                {
+                    return View(model);
+                }
+
+<# if(!String.IsNullOrEmpty(primaryKeyType) && String.Equals("System.Guid", primaryKeyType, StringComparison.OrdinalIgnoreCase)) { #>
+				model.<#= primaryKeyName #> = Guid.NewGuid();
+<# } #>
+				model.CreationDateTime = DateTime.UtcNow;
+                model.UpdateDateTime = DateTime.UtcNow;
+                model.CreatedByUserId = CurrentUser.Id;
+                model.UpdatedByUserId = CurrentUser.Id;
+
+				_db.Add(model);
+<# if (UseAsync) {#>
+				await _db.SaveAsync();
+<# } else { #>
+				_db.Save();
+<# } #>
+
+				ShowMessage("The <#= ModelTypeName.ToLower() #> was created successfully!", ToastrMessageTypeEnum.Success);
+
+                return RedirectToAction("details", new { id = model.<#= primaryKeyName #> });
+			}
+			catch (Exception ex)
+            {
+                this.ShowMessage(AppGlobalMessages.UnexpectedErrorMessage, ToastrMessageTypeEnum.Error);
+				LogError(ex);
+                return View(model);
+            }
+        }
+
+		/// <summary>
+        /// Renders the edit <#= ModelTypeName.ToLower() #> page
+        /// </summary>
+        /// <param name="id">The id of the <#= ModelTypeName.ToLower() #></param>
+        /// <returns>A redirect result to the index page if the <#= ModelTypeName.ToLower() #> doesn't exist, otherwise the edit <#= ModelTypeName.ToLower() #> page view</returns>
+		[HttpGet]
+<# if (UseAsync) { #>
+        public async Task<ActionResult> Edit(<#= primaryKeyShortTypeName #> id)
+<# } else { #>
+        public ActionResult Edit(<#= primaryKeyShortTypeName #> id)
+<# } #>
+        {
+<# if (UseAsync) { #>
+            var model = await _db.Get<#= ModelTypeName #>Async(id);
+<# } else { #>
+            var model = _db.Get<#= ModelTypeName #>(id);
+<# } #>
+            if (model == null)
+            {
+                ShowMessage("The <#= ModelTypeName.ToLower() #> was not found.", ToastrMessageTypeEnum.Error);
+                return RedirectToAction("index");
+            }
+
+            return View(model);
+        }
+
+<# if (IsOverpostingProtectionRequired) {
+    foreach (var line in OverpostingWarningMessage.Split(new string[] { Environment.NewLine }, StringSplitOptions.None)) { 
+#>
+        // <#= line #>
+<# } } #>
+
+		/// <summary>
+        /// Updates a <#= ModelTypeName.ToLower() #>
+        /// </summary>
+        /// <param name="id">The id of the <#= ModelTypeName.ToLower() #></param>
+        /// <param name="model">The model of the <#= ModelTypeName.ToLower() #></param>
+        /// <returns>A redirect result to the details page if the operation is successful, otherwise the edit <#= ModelTypeName.ToLower() #> page view</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+<# if (UseAsync) { #>
+        public async Task<ActionResult> Edit(<#= primaryKeyShortTypeName #> id, <#= bindAttribute #><#= ModelTypeName #> model)
+<# } else { #>
+        public ActionResult Edit(<#= primaryKeyShortTypeName #> id, <#= bindAttribute #><#= ModelTypeName #> model)
+<# } #>
+        {
+<# if (UseAsync) { #>
+			var entity = await _db.Get<#= ModelTypeName #>Async(id);
+<# } else { #>
+            var entity = _db.Get<#= ModelTypeName #>(id);
+<# } #>
+            if (entity == null)
+            {
+				ShowMessage("The <#= ModelTypeName.ToLower() #> was not found.", ToastrMessageTypeEnum.Error);
+                return RedirectToAction("index");
+			}
+
+			try
+			{
+				if (!ModelState.IsValid)
+                {
+                    return View(entity);
+                }
+
+				if (!TryUpdateModel(entity, new string[] { "<#= BindAttributeIncludeText.Replace(",", "\", \"") #>" }))
+                {
+                    this.ShowMessage(AppGlobalMessages.UnexpectedErrorMessage, ToastrMessageTypeEnum.Error);
+                    return View(entity);
+                }
+
+				entity.UpdateDateTime = DateTime.UtcNow;
+                entity.UpdatedByUserId = CurrentUser.Id;
+
+<# if (UseAsync) { #>
+                await _db.SaveAsync();
+<# } else { #>
+                _db.Save();
+<# } #>
+
+				ShowMessage("The <#= ModelTypeName.ToLower() #> was updated successfully!", ToastrMessageTypeEnum.Success);
+
+                return RedirectToAction("details", new { id = id });
+			}
+			catch (Exception ex)
+            {
+                this.ShowMessage(AppGlobalMessages.UnexpectedErrorMessage, ToastrMessageTypeEnum.Error);
+				LogError(ex);
+                return View(entity);
+            }
+        }
+
+		/// <summary>
+        /// Renders the delete <#= ModelTypeName.ToLower() #> page
+        /// </summary>
+        /// <param name="id">The id of the <#= ModelTypeName.ToLower() #></param>
+        /// <returns>The delete <#= ModelTypeName.ToLower() #> page view if the <#= ModelTypeName.ToLower() #> exists, otherwise a redirect result the index page</returns>
+		[HttpGet]
+<# if (UseAsync) { #>
+        public async Task<ActionResult> Delete(<#= primaryKeyShortTypeName #> id)
+<# } else { #>
+        public ActionResult Delete(<#= primaryKeyShortTypeName #> id)
+<# } #>
+        {
+<# if (UseAsync) { #>
+            var model = await _db.Get<#= ModelTypeName #>Async(id);
+<# } else { #>
+            var model = _db.Get<#= ModelTypeName #>(id);
+<# } #>
+            if (model == null)
+            {
+                ShowMessage("The <#= entitySetName.ToLower() #> was not found.", ToastrMessageTypeEnum.Error);
+                return RedirectToAction("index");
+            }
+
+            return View(model);
+        }
+
+		/// <summary>
+        /// Deletes a <#= ModelTypeName.ToLower() #>
+        /// </summary>
+        /// <param name="id">The id of the <#= ModelTypeName.ToLower() #></param>
+        /// <param name="formCollection">The collection of form values. This is only used only in order to make the method overload possible</param>
+        /// <returns>A redirect result to the index page with a success message if the operation is successful, otherwise with an error message</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+<# if (UseAsync) { #>
+        public async Task<ActionResult> Delete(<#= primaryKeyShortTypeName #> id, FormCollection formCollection)
+<# } else { #>
+        public ActionResult Delete(<#= primaryKeyShortTypeName #> id, FormCollection formCollection)
+<# } #>
+        {
+<# if (UseAsync) { #>
+				var model = await _db.Get<#= ModelTypeName #>Async(id);
+<# } else { #>
+				var model = _db.Get<#= ModelTypeName #>(id);
+<# } #>
+				if (model == null)
+				{
+					ShowMessage("The <#= ModelTypeName.ToLower() #> was not found.", ToastrMessageTypeEnum.Error);
+					return RedirectToAction("index");
+				}
+
+			try
+			{
+				_db.Delete(model);
+<# if (UseAsync) { #>
+				await _db.SaveAsync();
+<# } else { #>
+				_db.Save();
+<# } #>
+
+				ShowMessage("The <#= ModelTypeName.ToLower() #> was deleted successfully!", ToastrMessageTypeEnum.Success);
+
+				return RedirectToAction("index");
+			}
+            catch (Exception ex)
+            {
+                this.ShowMessage(AppGlobalMessages.UnexpectedErrorMessage, ToastrMessageTypeEnum.Error);
+				LogError(ex);
+
+                return View(model);
+            }
+        }
+
+        #endregion
+    }
+}
+<#+
+// This function converts the primary key short type name to its nullable equivalent when possible. This is required to make
+// sure that an HTTP 400 error is thrown when the user tries to access the edit, delete, or details action with null values.
+    string GetNullableTypeName(string typeName, string shortTypeName)
+    {
+        // The exceptions are caught because if for any reason the type is user defined, then the short type name will be used.
+        // In that case the user will receive a server error if null is passed to the edit, delete, or details actions.
+        Type primaryKeyType = null;
+        try
+        {
+            primaryKeyType = Type.GetType(typeName);
+        }
+        catch
+        {
+        }
+        if (primaryKeyType != null && (primaryKeyType.IsPrimitive || IsGuid(typeName)))
+        {
+            return shortTypeName + "?";
+        }
+        return shortTypeName;
+    }
+
+    bool IsGuid(string typeName) {
+        return String.Equals("System.Guid", typeName, StringComparison.OrdinalIgnoreCase);
+    }
+#>

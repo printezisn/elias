@@ -1,0 +1,86 @@
+﻿@model ISCIPagedList
+
+@{
+    int pageRange = 5;
+    int firstPage = Math.Max(1, Model.CurrentPage - pageRange);
+    int lastPage = Math.Min(Model.CurrentPage + pageRange, Model.TotalPages);
+
+    var newQueryString = HttpUtility.ParseQueryString(Request.QueryString.ToString());
+    newQueryString.Remove("_");
+    newQueryString.Set("page", "1");
+}
+
+<div class="row">
+    <div class="col-sm-6">
+        @Model.FirstPageItem - @Model.LastPageItem / @Model.TotalItems
+    </div>
+    <div class="col-sm-6">
+        <div class="pull-right">
+            <ul class="pagination">
+                <li class="@((Model.CurrentPage == 1) ? "disabled" : string.Empty)">
+                    @if (Model.CurrentPage == 1)
+                    {
+                        <a href="javascript:void(0)" class="disabled">
+                            First
+                            <i class="fa fa-angle-double-left"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a href="@(Request.Url.AbsolutePath + "?" + newQueryString)">
+                            First
+                            <i class="fa fa-angle-double-left"></i>
+                        </a>
+                    }
+                </li>
+                @if (firstPage > 1)
+                {
+                    newQueryString.Set("page", (firstPage - 1).ToString());
+
+                    <li>
+                        <a href="@(Request.Url.AbsolutePath + "?" + newQueryString)">
+                            <i class="fa fa-angle-left"></i>
+                        </a>
+                    </li>
+                }
+                @for (int i = firstPage; i <= lastPage; i++)
+                {
+                    newQueryString.Set("page", i.ToString());
+
+                    <li class="@((Model.CurrentPage == i) ? "active" : string.Empty)">
+                        <a href="@(Request.Url.AbsolutePath + "?" + newQueryString)">@i</a>
+                    </li>
+                }
+                @if (lastPage < Model.TotalPages)
+                {
+                    newQueryString.Set("page", (lastPage + 1).ToString());
+
+                    <li>
+                        <a href="@(Request.Url.AbsolutePath + "?" + newQueryString)">
+                            <i class="fa fa-angle-right"></i>
+                        </a>
+                    </li>
+                }
+
+                @{ newQueryString.Set("page", Model.TotalPages.ToString()); }
+
+                <li class="@((Model.CurrentPage == Model.TotalPages) ? "disabled" : string.Empty)">
+                    @if (Model.CurrentPage == Model.TotalPages)
+                    {
+                        <a href="javascript:void(0)" class="disabled">
+                            Last
+                            <i class="fa fa-angle-double-right"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a href="@(Request.Url.AbsolutePath + "?" + newQueryString)">
+                            Last
+                            <i class="fa fa-angle-double-right"></i>
+                        </a>
+                    }
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

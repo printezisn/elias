@@ -1,0 +1,58 @@
+﻿body {
+    padding-top: 70px;
+    padding-bottom: 50px;
+}
+
+.small-form {
+    max-width: 700px;
+    margin: auto;
+}
+
+.small-form h3 {
+    margin-top: 0;
+}
+
+label.required-field::after {
+    content: " *";
+    color: $brand-danger;
+}
+
+.input-group-btn > .btn {
+    line-height: 1.44;
+}
+
+table.dataTable thead .sorting_desc {
+    background: url(../img/sort_desc.png) center right no-repeat;
+    padding-right: 20px;
+}
+
+table.dataTable thead .sorting_asc {
+    background: url(../img/sort_asc.png) center right no-repeat;
+    padding-right: 20px;
+}
+
+table.dataTable thead .sorting {
+    background: url(../img/sort_both.png) center right no-repeat;
+    padding-right: 20px;
+}
+
+.sorting a, .sorting_asc a, .sorting_desc a {
+    display: block;
+    color: #fff;
+}
+
+.middle {
+    vertical-align: middle;
+}
+
+.form .btn {
+    margin-bottom: 5px;
+}
+
+.relative {
+    position: relative;
+}
+
+.pre-wrap {
+    white-space: pre-wrap;
+}
