@@ -11,6 +11,9 @@ using Elias.Web.Code.Attributes;
 using Elias.DAL;
 using Elias.DAL.Entities;
 using Elias.Web.Code;
+using Elias.Web.Models;
+using Elias.Web.Models.Enums;
+using Elias.DAL.Enums;
 
 namespace Elias.Web.Controllers
 {
@@ -58,6 +61,72 @@ namespace Elias.Web.Controllers
             }
 
             return View(collection);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult Accept(Guid id)
+        {
+            try
+            {
+                var leaveRequest = _db.GetLeaveRequest(id);
+                if (leaveRequest == null)
+                {
+                    return Json(new { Message = new ToastrMessage(null, "The leave request was not found.", ToastrMessageTypeEnum.Error) });
+                }
+
+                if (leaveRequest.StatusId != (byte)LeaveRequestStatusEnum.Pending)
+                {
+                    return Json(new { Message = new ToastrMessage(null, "The leave request is not valid anymore.", ToastrMessageTypeEnum.Error) });
+                }
+
+                EmployeeHelper.SetReservedDays(_db, leaveRequest.Employee);
+                if (leaveRequest.Employee.ReservedDays + leaveRequest.TotalDays > leaveRequest.Employee.LeaveDays)
+                {
+                    return Json(new { Message = new ToastrMessage(null, "The employee doesn't have enough remaining days.", ToastrMessageTypeEnum.Error) });
+                }
+
+                leaveRequest.StatusId = (byte)LeaveRequestStatusEnum.Accepted;
+                _db.Save();
+
+                // TODO: Send message to employee
+
+                return Json(new { Message = new ToastrMessage(null, "The leave request was accepted successfully!", ToastrMessageTypeEnum.Success) });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Message = new ToastrMessage(null, AppGlobalMessages.UnexpectedErrorMessage, ToastrMessageTypeEnum.Error) });
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult Reject(Guid id)
+        {
+            try
+            {
+                var leaveRequest = _db.GetLeaveRequest(id);
+                if (leaveRequest == null)
+                {
+                    return Json(new { Message = new ToastrMessage(null, "The leave request was not found.", ToastrMessageTypeEnum.Error) });
+                }
+
+                if (leaveRequest.StatusId != (byte)LeaveRequestStatusEnum.Pending)
+                {
+                    return Json(new { Message = new ToastrMessage(null, "The leave request is not valid anymore.", ToastrMessageTypeEnum.Error) });
+                }
+
+                leaveRequest.StatusId = (byte)LeaveRequestStatusEnum.Rejected;
+                _db.Save();
+
+                // TODO: Send message to employee
+
+                return Json(new { Message = new ToastrMessage(null, "The leave request was rejected successfully!", ToastrMessageTypeEnum.Success) });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Message = new ToastrMessage(null, AppGlobalMessages.UnexpectedErrorMessage, ToastrMessageTypeEnum.Error) });
+            }
         }
 
         #endregion

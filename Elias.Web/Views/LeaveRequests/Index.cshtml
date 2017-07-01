@@ -15,6 +15,14 @@
     </ul>
 }
 
+@section Scripts {
+    <script>
+        $(document).on('sci-ajax-success', '.accept-leave-request-form, .reject-leave-request-form', function (e, form, data) {
+            $('.sci-ajax-grid').trigger('sci-ajax-grid-load');
+        });
+    </script>    
+}
+
 <h3>@ViewBag.Title</h3>
 
 <hr />

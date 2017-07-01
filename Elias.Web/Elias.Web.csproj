@@ -224,6 +224,8 @@
     <Content Include="Views\Employees\Grid.cshtml" />
     <Content Include="Views\LeaveRequests\Index.cshtml" />
     <Content Include="Views\LeaveRequests\Grid.cshtml" />
+    <Content Include="Views\LeaveRequests\Modals\Accept.cshtml" />
+    <Content Include="Views\LeaveRequests\Modals\Reject.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

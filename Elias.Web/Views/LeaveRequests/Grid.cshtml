@@ -14,8 +14,11 @@
             </tr>
         </thead>
         <tbody>
+            @{ int index = 0; }
             @foreach (var item in Model)
             {
+                index++;
+
                 <tr>
                     <td>
                         @item.Employee.FirstName @item.Employee.LastName
@@ -37,7 +40,14 @@
                         @DateHelper.RenderDateTime(item.RequestDate)
                     </td>
                     <td>
-                        
+                        @if (item.StatusId == (byte)Elias.DAL.Enums.LeaveRequestStatusEnum.Pending)
+                        {
+                            <a href="#" class="btn btn-xs btn-success" data-toggle="modal" data-target="#accept-leave-request-@index">Accept</a>
+                            <a href="#" class="btn btn-xs btn-danger" data-toggle="modal" data-target="#reject-leave-request-@index">Reject</a>
+
+                            @Html.Partial("Modals/Accept", item, new ViewDataDictionary() { { "Index", index } })
+                            @Html.Partial("Modals/Reject", item, new ViewDataDictionary() { { "Index", index } })
+                        }
                     </td>
                 </tr>
             }

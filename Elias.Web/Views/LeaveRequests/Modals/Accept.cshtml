@@ -1,0 +1,37 @@
+﻿@model Elias.DAL.Entities.LeaveRequest
+
+@{
+    int index = ViewBag.Index;
+}
+
+<div class="modal fade" tabindex="-1" role="dialog" id="accept-leave-request-@index">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Accept Leave Request</h4>
+            </div>
+            @using (Ajax.BeginForm("accept", "leaverequests", new AjaxOptions()
+            {
+                HttpMethod = "POST",
+                OnBegin = "SCIForm.onAjaxBegin",
+                OnSuccess = "SCIForm.onAjaxSuccess"
+            }, new { @class = "accept-leave-request-form" }))
+            {
+                <div class="modal-body">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.Id" />
+
+                    <div class="alert alert-danger alert-dismissible fade in" role="alert" style="display: none">
+                        <ul></ul>
+                    </div>
+                    <p>Are you sure you want to accept this leave request ?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                    <button type="submit" class="btn btn-success">Yes</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
