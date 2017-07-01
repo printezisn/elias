@@ -1,7 +1,34 @@
-﻿
-@{
-    ViewBag.Title = "Index";
+﻿@{
+    ViewBag.Title = "Dashboard";
 }
 
-<h2>Index</h2>
+@section Scripts {
+    <script>
+        $(function () {
+            $('#HomeCalendar').fullCalendar({
+                header: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'month,basicWeek,listMonth'
+                },
+                defaultDate: '@DateTime.UtcNow.ToString("yyyy-MM-dd")',
+                navLinks: true,
+                editable: true,
+                eventLimit: true,
+                eventSources: [
+                    {
+                        url: '@Url.Action("calendar")',
+                        color: '#a94442'
+                    }
+                ]
+            });
+        });
+    </script>
+}
 
+<h3>@ViewBag.Title</h3>
+
+<hr />
+<br />
+
+<div id="HomeCalendar"></div>

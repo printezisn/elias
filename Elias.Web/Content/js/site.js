@@ -7,6 +7,7 @@ import 'jquery-validation';
 import 'jquery-validation-unobtrusive';
 import 'jquery-ajax-unobtrusive';
 import 'bootstrap-datepicker';
+import 'fullcalendar';
 import { ELApp, SCIUrlManager, SCIModal, SCIAjaxGrid, SCIForm } from './imports/_core';
 
 window.$ = $;
