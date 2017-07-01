@@ -1,0 +1,13 @@
+﻿@{
+    var user = ViewBag.User as Elias.DAL.Entities.User;
+
+    string controller = Request.RequestContext.RouteData.Values["controller"].ToString().ToLower();
+    string action = Request.RequestContext.RouteData.Values["action"].ToString().ToLower();
+    string page = controller + "-" + action;
+}
+
+<ul class="nav nav-sidebar">
+    <li class="@((page == "home-index") ? "active" : string.Empty)">
+        <a href="@Url.Action("index", "home")">Dashboard</a>
+    </li>
+</ul>
