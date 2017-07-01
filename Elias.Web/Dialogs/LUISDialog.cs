@@ -25,7 +25,7 @@ namespace Elias.Web.Dialogs
         [LuisIntent("None")]
         public async Task None (IDialogContext context, LuisResult result)
         {
-            await context.PostAsync($"None");
+            await context.PostAsync($"i'm sorry I didn't get this. If you are having trouble you can type \"help\" help or you can contact my human supervisor on manager@gamaoya.com");
         }
 
         [LuisIntent("Communication.Confirm")]
@@ -43,7 +43,7 @@ namespace Elias.Web.Dialogs
         [LuisIntent("Help")]
         public async Task Help(IDialogContext context, LuisResult result)
         {
-            await context.PostAsync($"help");
+            await context.PostAsync($"Seem lost? Don't worry. You are not stupid you're special. Try one of the following. \"How many days of leave do I have left?\" \"I'd like to take some days of between 26/07/2017 and 28/07/2017\"");
         }
 
         [LuisIntent("Identification")]
@@ -86,7 +86,7 @@ namespace Elias.Web.Dialogs
                 {
                     EmployeeHelper.SetReservedDays(db, employee);
                     int daysRemaining = employee.LeaveDays - employee.ReservedDays > 0 ? employee.LeaveDays - employee.ReservedDays : 0;
-                    await context.PostAsync($"You have {daysRemaining}. Don't spend them all at once ;)");
+                    await context.PostAsync($"You have {daysRemaining} days. Don't spend them all at once ;)");
                 }
                 else
                 {
