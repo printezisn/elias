@@ -4,11 +4,12 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
+using Elias.Web.Controllers;
 
 namespace Elias.Web
 {
     [BotAuthentication]
-    public class MessagesController : ApiController
+    public class MessagesController : BaseApiController
     {
         /// <summary>
         /// POST: api/Messages
