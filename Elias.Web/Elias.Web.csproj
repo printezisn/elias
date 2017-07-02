@@ -269,6 +269,10 @@
     <Content Include="Content\build\fonts\glyphicons-halflings-regular.woff" />
     <Content Include="Content\build\fonts\glyphicons-halflings-regular.woff2" />
     <Content Include="Content\build\site-1ff8ada113bdf43b9a1a.min.js.LICENSE" />
+    <None Include="Properties\PublishProfiles\e-lias - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\e-lias - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\PepepeBot - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\PepepeBot - Web Deploy %282%29.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

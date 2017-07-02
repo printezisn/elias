@@ -6,6 +6,8 @@ using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 using Elias.Web.Controllers;
 using Elias.Web.Dialogs;
+using System.Linq;
+
 
 namespace Elias.Web
 {
@@ -18,8 +20,11 @@ namespace Elias.Web
         /// </summary>
         public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
         {
+            
             if (activity.Type == ActivityTypes.Message)
             {
+                //_db.GetEmployees(true).First().LastUsedId = activity.From.Id;
+                //_db.Save();
                 await Conversation.SendAsync(activity, () => new LUISDialog());
 
                // await Conversation.SendAsync(activity, () => new Dialogs.RootDialog());

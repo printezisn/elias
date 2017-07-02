@@ -1,4 +1,5 @@
 ﻿using Elias.DAL.Entities;
+using Elias.DAL.Enums;
 using Elias.DAL.Repository;
 using Elias.Web.Code;
 using Microsoft.Bot.Builder.Dialogs;
@@ -78,15 +79,32 @@ namespace Elias.Web.Dialogs
         [LuisIntent("RequestLeave")]
         public async Task RequestLeave(IDialogContext context, LuisResult result)
         {
+
             if (result.Entities.Count != 0 && result.Entities.Count < 3)
             {
                 if (result.Entities.First().Type == "builtin.datetimeV2.daterange")
                 {
+                    using (var db = new DataRepository())
+                    {
 
-                    var daterange = result.Entities.First().Resolution["values"];
-                    //var startDate = daterange["start"].ToObject<DateTime>();
-                    //var endDate = daterange["end"].ToObject<DateTime>();
-
+                        var daterange = result.Entities.First().Resolution["values"];
+                        System.Diagnostics.Debug.WriteLine(daterange.ToString());
+                        JArray dateRangesArray = JArray.Parse(daterange.ToString());
+                        var startDate = dateRangesArray.First["start"].ToObject<DateTime>();
+                        var endDate = dateRangesArray.First["end"].ToObject<DateTime>();
+                        var duration = (int)(endDate - startDate).TotalDays;
+                        db.Add(new LeaveRequest()
+                        {
+                            Id = Guid.NewGuid(),
+                            FromDate = startDate,
+                            ToDate = endDate,
+                            RequestDate = context.Activity.Timestamp.HasValue ? context.Activity.Timestamp.Value : new DateTime(),
+                            TotalDays = duration,
+                            StatusId = (byte)LeaveRequestStatusEnum.Pending,
+                            EmployeeId = GetEmployee(context.Activity, db).Id
+                        });
+                        db.Save();
+                    }
                 }
                 else if (result.Entities.Count == 2 && result.Entities.All(e => e.Type == "builtin.datetimeV2.date"))
                 {
@@ -97,6 +115,7 @@ namespace Elias.Web.Dialogs
             {
                 await context.PostAsync($"I'm not sure about when you want your leave. Maybe try something like \"I'd like a few days off between dd/mm/yy and dd/mm/yy\"");
             }
+
         }
 
         [LuisIntent("RequestRemaining")]
