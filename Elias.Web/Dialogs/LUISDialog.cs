@@ -77,6 +77,7 @@ namespace Elias.Web.Dialogs
 
             if (result.Entities.Count != 0 && result.Entities.Count < 3)
             {
+                //date range
                 if (result.Entities.First().Type == "builtin.datetimeV2.daterange")
                 {
                     using (var db = new DataRepository())
@@ -106,6 +107,7 @@ namespace Elias.Web.Dialogs
                         PromptDialog.Confirm(context, UserConfirmationOfRequest, $"You want a leave starting on {startDate.ToShortDateString()} and ending on {endDate.ToShortDateString()} for a total of {duration} days. Is that right?");
                     }
                 }
+                //start date end date
                 else if (result.Entities.Count == 2 && result.Entities.All(e => e.Type == "builtin.datetimeV2.date"))
                 {
 
@@ -136,6 +138,28 @@ namespace Elias.Web.Dialogs
                         };
                         context.PrivateConversationData.SetValue<LeaveRequest>("leaveRequest", leaverequest);
                         PromptDialog.Confirm(context, UserConfirmationOfRequest, $"You want a leave starting on {startDate.ToShortDateString()} and ending on {endDate.ToShortDateString()} for a total of {duration} days. Is that right?");
+                    }
+                }
+                //one day
+                else if (result.Entities.Count == 2 && result.Entities.Any(e => e.Type == "builtin.datetimeV2.date"))
+                {
+                    using (var db = new DataRepository())
+                    {
+                        var dateEntity = result.Entities.FirstOrDefault(e => e.Type == "builtin.datetimeV2.date");
+                        var date = DateTime.Parse(dateEntity.Entity);
+                        int duration = 1;
+                        var leaverequest = new LeaveRequest()
+                        {
+                            Id = Guid.NewGuid(),
+                            FromDate = date,
+                            ToDate = date,
+                            RequestDate = context.Activity.Timestamp.HasValue ? context.Activity.Timestamp.Value : new DateTime(),
+                            TotalDays = duration,
+                            StatusId = (byte)LeaveRequestStatusEnum.Pending,
+                            EmployeeId = GetEmployee(context.Activity, db).Id
+                        };
+                        context.PrivateConversationData.SetValue<LeaveRequest>("leaveRequest", leaverequest);
+                        PromptDialog.Confirm(context, UserConfirmationOfRequest, $"You want a leave starting on {date.ToShortDateString()} and ending on {date.ToShortDateString()} for a total of {duration} days. Is that right?");
                     }
                 }
             }
