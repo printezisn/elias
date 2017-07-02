@@ -2,6 +2,7 @@
 using Elias.DAL.Enums;
 using Elias.DAL.Repository;
 using Elias.Web.Code;
+using Elias.Web.Hubs;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Luis;
 using Microsoft.Bot.Builder.Luis.Models;
@@ -136,6 +137,7 @@ namespace Elias.Web.Dialogs
                     db.Save();
 
                 }
+                NotificationHub.UpdateLeaveRequests();
                 await context.PostAsync("Your request has been transfered to a human. My sensors indicate intense laughter from his office.");
             }
             else
