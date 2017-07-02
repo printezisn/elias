@@ -36,8 +36,13 @@ namespace Elias.DAL.Entities
         [SCIMin(0)]
         public int LeaveDays { get; set; }
 
+        [DisplayName("Activation Code")]
+        [SCIMaxLength(6)]
+        public string ActivationCode { get; set; }
+
+        public DateTime? CodeExpirationDateTime { get; set; }
+
         [DisplayName("Skype ID")]
-        [SCIRequired]
         [SCIMaxLength(250)]
         public string SkypeId { get; set; }
 

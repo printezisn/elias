@@ -65,12 +65,6 @@ namespace Elias.Web.Dialogs
             await context.PostAsync($"Hello. I am e-lias your friendly neighbourhood HR bot. You can ask me for a leave of absence or to check how many days you have left. Try me, let's get rid of humans together (Y)");
         }
 
-        [LuisIntent("Identification")]
-        public async Task Identification(IDialogContext context, LuisResult result)
-        {
-            await context.PostAsync($"Identification");
-        }
-
         [LuisIntent("RequestLeave")]
         public async Task RequestLeave(IDialogContext context, LuisResult result)
         {
@@ -164,6 +158,44 @@ namespace Elias.Web.Dialogs
             else
             {
                 await context.PostAsync($"I'm not sure about when you want your leave. Maybe try something like \"I'd like a few days off between dd/mm/yy and dd/mm/yy\"");
+            }
+        }
+
+        [LuisIntent("Identification")]
+        public async Task Identification(IDialogContext context, LuisResult result)
+        {
+            var pin = result.Entities.FirstOrDefault(f => f.Type == "PIN");
+            if (pin == null)
+            {
+                await context.PostAsync("The pin you entered is invalid. Please try again.");
+                return;
+            }
+
+            using (IDataRepository db = new DataRepository())
+            {
+                var employee = db.GetEmployees(true).FirstOrDefault(f => f.ActivationCode == pin.Entity);
+                if (employee == null)
+                {
+                    await context.PostAsync("The pin you entered is invalid. Please try again.");
+                    return;
+                }
+
+                if (context.Activity.ChannelId != null && context.Activity.ChannelId.ToLower() == "facebook")
+                {
+                    employee.FacebookId = context.Activity.From.Id;
+                }
+                else
+                {
+                    employee.SkypeId = context.Activity.From.Id;
+                }
+
+                employee.ServiceUrl = context.Activity.ServiceUrl;
+                employee.LastUsedId = context.Activity.From.Id;
+                employee.BotId = context.Activity.Recipient.Id;
+
+                db.Save();
+
+                await context.PostAsync($"Hello {employee.FirstName} {employee.LastName}! Welcome to the team!");
             }
         }
 

@@ -12,6 +12,7 @@ using Elias.DAL;
 using Elias.DAL.Entities;
 using Elias.Web.Code;
 using Elias.Web.Models.Enums;
+using System.Text;
 
 namespace Elias.Web.Controllers
 {
@@ -83,6 +84,56 @@ namespace Elias.Web.Controllers
         }
 
         /// <summary>
+        /// Generates a new activation code for an employee
+        /// </summary>
+        /// <param name="id">The id of the employee</param>
+        /// <returns>A redirect result to the details page if the operation is successful, otherwise the edit employee page view</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult GenerateCode(int id)
+        {
+            var entity = _db.GetEmployee(id);
+            if (entity == null)
+            {
+                ShowMessage("The employee was not found.", ToastrMessageTypeEnum.Error);
+                return RedirectToAction("index");
+            }
+
+            try
+            {
+                Random random = new Random();
+                int i;
+                StringBuilder codeBuilder = new StringBuilder();
+                bool codeExists = true;
+
+                while (codeExists)
+                {
+                    for (i = 0; i < 6; i++)
+                    {
+                        codeBuilder.Append(random.Next(0, 9));
+                    }
+
+                    entity.ActivationCode = codeBuilder.ToString();
+
+                    var now = DateTime.UtcNow;
+                    codeExists = _db.GetEmployees().Any(a => a.ActivationCode == entity.ActivationCode && a.CodeExpirationDateTime > now);
+                }
+
+                entity.CodeExpirationDateTime = DateTime.UtcNow.AddMinutes(15);
+                _db.Save();
+
+                ShowMessage("A new code was generated successfully!", ToastrMessageTypeEnum.Success);
+
+                return RedirectToAction("details", new { id = id });
+            }
+            catch (Exception ex)
+            {
+                this.ShowMessage(AppGlobalMessages.UnexpectedErrorMessage, ToastrMessageTypeEnum.Error);
+                return RedirectToAction("details", new { id = id });
+            }
+        }
+
+        /// <summary>
         /// Renders the create employee page
         /// </summary>
         /// <returns>The create employee page view</returns>
@@ -101,19 +152,10 @@ namespace Elias.Web.Controllers
         /// <returns>A redirect result to the details page if the operation is successful, otherwise the create employee page view</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "FirstName,LastName,Email,LeaveDays,SkypeId,FacebookId,ServiceUrl")] Employee model)
+        public ActionResult Create([Bind(Include = "FirstName,LastName,Email,LeaveDays")] Employee model)
         {
             try
             {
-                if (model != null && !string.IsNullOrWhiteSpace(model.SkypeId) && _db.GetEmployees().Any(a => a.SkypeId == model.SkypeId))
-                {
-                    this.AddModelError<Employee, string>(m => m.SkypeId, "The Skype ID you entered is already used.");
-                }
-                if (model != null && !string.IsNullOrWhiteSpace(model.FacebookId) && _db.GetEmployees().Any(a => a.FacebookId == model.FacebookId))
-                {
-                    this.AddModelError<Employee, string>(m => m.SkypeId, "The Facebook ID you entered is already used.");
-                }
-
                 if (!ModelState.IsValid)
                 {
                     return View(model);
@@ -162,7 +204,7 @@ namespace Elias.Web.Controllers
         /// <returns>A redirect result to the details page if the operation is successful, otherwise the edit employee page view</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, [Bind(Include = "FirstName,LastName,Email,LeaveDays,SkypeId,FacebookId,ServiceUrl")] Employee model)
+        public ActionResult Edit(int id, [Bind(Include = "FirstName,LastName,Email,LeaveDays")] Employee model)
         {
             var entity = _db.GetEmployee(id);
             if (entity == null)
@@ -173,21 +215,12 @@ namespace Elias.Web.Controllers
 
             try
             {
-                if (model != null && !string.IsNullOrWhiteSpace(model.SkypeId) && model.SkypeId != entity.SkypeId && _db.GetEmployees().Any(a => a.SkypeId == model.SkypeId))
-                {
-                    this.AddModelError<Employee, string>(m => m.SkypeId, "The Skype ID you entered is already used.");
-                }
-                if (model != null && !string.IsNullOrWhiteSpace(model.FacebookId) && model.FacebookId != entity.FacebookId && _db.GetEmployees().Any(a => a.FacebookId == model.FacebookId))
-                {
-                    this.AddModelError<Employee, string>(m => m.SkypeId, "The Facebook ID you entered is already used.");
-                }
-
                 if (!ModelState.IsValid)
                 {
                     return View(entity);
                 }
 
-                if (!TryUpdateModel(entity, new string[] { "FirstName", "LastName", "Email", "LeaveDays", "SkypeId", "FacebookId", "ServiceUrl" }))
+                if (!TryUpdateModel(entity, new string[] { "FirstName", "LastName", "Email", "LeaveDays" }))
                 {
                     this.ShowMessage(AppGlobalMessages.UnexpectedErrorMessage, ToastrMessageTypeEnum.Error);
                     return View(entity);

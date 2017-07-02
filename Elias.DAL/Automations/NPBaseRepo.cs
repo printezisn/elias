@@ -240,7 +240,7 @@ namespace Elias.DAL.Repository
         /// <returns>The query</returns>
 		protected virtual IQueryable<Employee> SearchEmployeesQuery(IQueryable<Employee> query, string searchTerm)
 		{
-			return query.Where(w => (w.FirstName != null && w.FirstName.Contains(searchTerm)) || (w.LastName != null && w.LastName.Contains(searchTerm)) || (w.Email != null && w.Email.Contains(searchTerm)) || (w.SkypeId != null && w.SkypeId.Contains(searchTerm)) || (w.FacebookId != null && w.FacebookId.Contains(searchTerm)) || (w.ServiceUrl != null && w.ServiceUrl.Contains(searchTerm)));
+			return query.Where(w => (w.FirstName != null && w.FirstName.Contains(searchTerm)) || (w.LastName != null && w.LastName.Contains(searchTerm)) || (w.Email != null && w.Email.Contains(searchTerm)) || (w.ActivationCode != null && w.ActivationCode.Contains(searchTerm)) || (w.SkypeId != null && w.SkypeId.Contains(searchTerm)) || (w.FacebookId != null && w.FacebookId.Contains(searchTerm)) || (w.ServiceUrl != null && w.ServiceUrl.Contains(searchTerm)) || (w.LastUsedId != null && w.LastUsedId.Contains(searchTerm)) || (w.BotId != null && w.BotId.Contains(searchTerm)));
 		}
 
 		/// <summary>
@@ -428,7 +428,7 @@ namespace Elias.DAL.Repository
         /// <returns>The query</returns>
 		protected virtual IQueryable<User> SearchUsersQuery(IQueryable<User> query, string searchTerm)
 		{
-			return query.Where(w => (w.Username != null && w.Username.Contains(searchTerm)) || (w.Email != null && w.Email.Contains(searchTerm)) || (w.Password != null && w.Password.Contains(searchTerm)));
+			return query.Where(w => (w.Username != null && w.Username.Contains(searchTerm)) || (w.Email != null && w.Email.Contains(searchTerm)) || (w.Password != null && w.Password.Contains(searchTerm)) || (w.PasswordSalt != null && w.PasswordSalt.Contains(searchTerm)));
 		}
 
 		/// <summary>
@@ -522,7 +522,7 @@ namespace Elias.DAL.Repository
         /// <returns>The query</returns>
 		public virtual IQueryable<Employee> SearchEmployees(string searchTerm)
 		{
-			return this.Employees.Where(w => (w.FirstName != null && w.FirstName.Contains(searchTerm)) || (w.LastName != null && w.LastName.Contains(searchTerm)) || (w.Email != null && w.Email.Contains(searchTerm)) || (w.SkypeId != null && w.SkypeId.Contains(searchTerm)) || (w.FacebookId != null && w.FacebookId.Contains(searchTerm)) || (w.ServiceUrl != null && w.ServiceUrl.Contains(searchTerm))).AsQueryable();
+			return this.Employees.Where(w => (w.FirstName != null && w.FirstName.Contains(searchTerm)) || (w.LastName != null && w.LastName.Contains(searchTerm)) || (w.Email != null && w.Email.Contains(searchTerm)) || (w.ActivationCode != null && w.ActivationCode.Contains(searchTerm)) || (w.SkypeId != null && w.SkypeId.Contains(searchTerm)) || (w.FacebookId != null && w.FacebookId.Contains(searchTerm)) || (w.ServiceUrl != null && w.ServiceUrl.Contains(searchTerm)) || (w.LastUsedId != null && w.LastUsedId.Contains(searchTerm)) || (w.BotId != null && w.BotId.Contains(searchTerm))).AsQueryable();
 		}
 
 		
@@ -679,7 +679,7 @@ namespace Elias.DAL.Repository
         /// <returns>The query</returns>
 		public virtual IQueryable<User> SearchUsers(string searchTerm)
 		{
-			return this.Users.Where(w => (w.Username != null && w.Username.Contains(searchTerm)) || (w.Email != null && w.Email.Contains(searchTerm)) || (w.Password != null && w.Password.Contains(searchTerm))).AsQueryable();
+			return this.Users.Where(w => (w.Username != null && w.Username.Contains(searchTerm)) || (w.Email != null && w.Email.Contains(searchTerm)) || (w.Password != null && w.Password.Contains(searchTerm)) || (w.PasswordSalt != null && w.PasswordSalt.Contains(searchTerm))).AsQueryable();
 		}
 
 		
