@@ -92,19 +92,18 @@ namespace Elias.Web.Dialogs
                             startDate = endDate;
                             endDate = temp;
                         }
-                        var duration = (int)(endDate - startDate).TotalDays;
                         var leaverequest = new LeaveRequest()
                         {
                             Id = Guid.NewGuid(),
                             FromDate = startDate,
                             ToDate = endDate,
                             RequestDate = context.Activity.Timestamp.HasValue ? context.Activity.Timestamp.Value : new DateTime(),
-                            TotalDays = duration,
                             StatusId = (byte)LeaveRequestStatusEnum.Pending,
                             EmployeeId = GetEmployee(context.Activity, db).Id
                         };
+                        leaverequest.ComputeTotalDays();
                         context.PrivateConversationData.SetValue<LeaveRequest>("leaveRequest", leaverequest);
-                        PromptDialog.Confirm(context, UserConfirmationOfRequest, $"You want a leave starting on {startDate.ToShortDateString()} and ending on {endDate.ToShortDateString()} for a total of {duration} days. Is that right?");
+                        PromptDialog.Confirm(context, UserConfirmationOfRequest, $"You want a leave starting on {startDate.ToShortDateString()} and ending on {endDate.ToShortDateString()} for a total of {leaverequest.TotalDays} days. Is that right?");
                     }
                 }
                 //start date end date
@@ -124,7 +123,6 @@ namespace Elias.Web.Dialogs
                             startDate = endDate;
                             endDate = temp;
                         }
-                        var duration = (int)(endDate - startDate).TotalDays;
 
                         var leaverequest = new LeaveRequest()
                         {
@@ -132,12 +130,13 @@ namespace Elias.Web.Dialogs
                             FromDate = startDate,
                             ToDate = endDate,
                             RequestDate = context.Activity.Timestamp.HasValue ? context.Activity.Timestamp.Value : new DateTime(),
-                            TotalDays = duration,
                             StatusId = (byte)LeaveRequestStatusEnum.Pending,
                             EmployeeId = GetEmployee(context.Activity, db).Id
                         };
+                        leaverequest.ComputeTotalDays();
+
                         context.PrivateConversationData.SetValue<LeaveRequest>("leaveRequest", leaverequest);
-                        PromptDialog.Confirm(context, UserConfirmationOfRequest, $"You want a leave starting on {startDate.ToShortDateString()} and ending on {endDate.ToShortDateString()} for a total of {duration} days. Is that right?");
+                        PromptDialog.Confirm(context, UserConfirmationOfRequest, $"You want a leave starting on {startDate.ToShortDateString()} and ending on {endDate.ToShortDateString()} for a total of {leaverequest.TotalDays} days. Is that right?");
                     }
                 }
                 //one day
@@ -147,19 +146,18 @@ namespace Elias.Web.Dialogs
                     {
                         var dateEntity = result.Entities.FirstOrDefault(e => e.Type == "builtin.datetimeV2.date");
                         var date = DateTime.Parse(dateEntity.Entity);
-                        int duration = 1;
                         var leaverequest = new LeaveRequest()
                         {
                             Id = Guid.NewGuid(),
                             FromDate = date,
                             ToDate = date,
                             RequestDate = context.Activity.Timestamp.HasValue ? context.Activity.Timestamp.Value : new DateTime(),
-                            TotalDays = duration,
                             StatusId = (byte)LeaveRequestStatusEnum.Pending,
                             EmployeeId = GetEmployee(context.Activity, db).Id
                         };
+                        leaverequest.ComputeTotalDays();
                         context.PrivateConversationData.SetValue<LeaveRequest>("leaveRequest", leaverequest);
-                        PromptDialog.Confirm(context, UserConfirmationOfRequest, $"You want a leave starting on {date.ToShortDateString()} and ending on {date.ToShortDateString()} for a total of {duration} days. Is that right?");
+                        PromptDialog.Confirm(context, UserConfirmationOfRequest, $"You want a leave starting on {date.ToShortDateString()} and ending on {date.ToShortDateString()} for a total of {leaverequest.TotalDays} days. Is that right?");
                     }
                 }
             }
