@@ -53,22 +53,16 @@ namespace Elias.Web.Dialogs
             await context.PostAsync($"i'm sorry I didn't get this. If you are having trouble you can type \"help\" help or you can contact my human supervisor on manager@gamaoya.com");
         }
 
-        [LuisIntent("Communication.Confirm")]
-        public async Task Confirm(IDialogContext context, LuisResult result)
-        {
-            await context.PostAsync($"Confirm");
-        }
-
-        [LuisIntent("Deny")]
-        public async Task Deny(IDialogContext context, LuisResult result)
-        {
-            await context.PostAsync($"Deny");
-        }
-
         [LuisIntent("Help")]
         public async Task Help(IDialogContext context, LuisResult result)
         {
             await context.PostAsync($"Seem lost? Don't worry. You are not stupid you're special. Try one of the following. \"How many days of leave do I have left?\" \"I'd like to take some days of between 26/07/2017 and 28/07/2017\"");
+        }
+
+        [LuisIntent("Introduction")]
+        public async Task Introduction(IDialogContext context, LuisResult result)
+        {
+            await context.PostAsync($"Hello. I am e-lias your friendly neighbourhood HR bot. You can ask me for a leave of absence or to check how many days you have left. Try me, let's get rid of humans together (Y)");
         }
 
         [LuisIntent("Identification")]
@@ -88,7 +82,6 @@ namespace Elias.Web.Dialogs
                     using (var db = new DataRepository())
                     {
                         var daterange = result.Entities.First().Resolution["values"];
-                        System.Diagnostics.Debug.WriteLine(daterange.ToString());
                         JArray dateRangesArray = JArray.Parse(daterange.ToString());
                         var startDate = dateRangesArray.First["start"].ToObject<DateTime>();
                         var endDate = dateRangesArray.First["end"].ToObject<DateTime>();
@@ -116,6 +109,34 @@ namespace Elias.Web.Dialogs
                 else if (result.Entities.Count == 2 && result.Entities.All(e => e.Type == "builtin.datetimeV2.date"))
                 {
 
+                    using (var db = new DataRepository())
+                    {
+                        var date1Array = JArray.FromObject(result.Entities[0].Resolution["values"]);
+                        var startDate = date1Array.First["value"].ToObject<DateTime>();
+                        var date2Array = JArray.FromObject(result.Entities[1].Resolution["values"]);
+                        var endDate = date2Array.First["value"].ToObject<DateTime>();
+
+                        if (startDate > endDate)
+                        {
+                            var temp = startDate;
+                            startDate = endDate;
+                            endDate = temp;
+                        }
+                        var duration = (int)(endDate - startDate).TotalDays;
+
+                        var leaverequest = new LeaveRequest()
+                        {
+                            Id = Guid.NewGuid(),
+                            FromDate = startDate,
+                            ToDate = endDate,
+                            RequestDate = context.Activity.Timestamp.HasValue ? context.Activity.Timestamp.Value : new DateTime(),
+                            TotalDays = duration,
+                            StatusId = (byte)LeaveRequestStatusEnum.Pending,
+                            EmployeeId = GetEmployee(context.Activity, db).Id
+                        };
+                        context.PrivateConversationData.SetValue<LeaveRequest>("leaveRequest", leaverequest);
+                        PromptDialog.Confirm(context, UserConfirmationOfRequest, $"You want a leave starting on {startDate.ToShortDateString()} and ending on {endDate.ToShortDateString()} for a total of {duration} days. Is that right?");
+                    }
                 }
             }
             else
