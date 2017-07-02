@@ -86,14 +86,19 @@ namespace Elias.Web.Dialogs
                 {
                     using (var db = new DataRepository())
                     {
-
                         var daterange = result.Entities.First().Resolution["values"];
                         System.Diagnostics.Debug.WriteLine(daterange.ToString());
                         JArray dateRangesArray = JArray.Parse(daterange.ToString());
                         var startDate = dateRangesArray.First["start"].ToObject<DateTime>();
                         var endDate = dateRangesArray.First["end"].ToObject<DateTime>();
+                        if (startDate > endDate)
+                        {
+                            var temp = startDate;
+                            startDate = endDate;
+                            endDate = temp;
+                        }
                         var duration = (int)(endDate - startDate).TotalDays;
-                        db.Add(new LeaveRequest()
+                        var leaverequest = new LeaveRequest()
                         {
                             Id = Guid.NewGuid(),
                             FromDate = startDate,
@@ -102,8 +107,9 @@ namespace Elias.Web.Dialogs
                             TotalDays = duration,
                             StatusId = (byte)LeaveRequestStatusEnum.Pending,
                             EmployeeId = GetEmployee(context.Activity, db).Id
-                        });
-                        db.Save();
+                        };
+                        context.PrivateConversationData.SetValue<LeaveRequest>("leaveRequest", leaverequest);
+                        PromptDialog.Confirm(context, UserConfirmationOfRequest, $"You want a leave starting on {startDate.ToShortDateString()} and ending on {endDate.ToShortDateString()} for a total of {duration} days. Is that right?");
                     }
                 }
                 else if (result.Entities.Count == 2 && result.Entities.All(e => e.Type == "builtin.datetimeV2.date"))
@@ -115,7 +121,27 @@ namespace Elias.Web.Dialogs
             {
                 await context.PostAsync($"I'm not sure about when you want your leave. Maybe try something like \"I'd like a few days off between dd/mm/yy and dd/mm/yy\"");
             }
+        }
 
+        private async Task UserConfirmationOfRequest(IDialogContext context, IAwaitable<bool> result)
+        {
+            bool accept = await result;
+            if (accept)
+            {
+                using (var db = new DataRepository())
+                {
+                    var leaveRequest = context.PrivateConversationData.GetValue<LeaveRequest>("leaveRequest");
+                    context.PrivateConversationData.RemoveValue("leaveRequest");
+                    db.Add(leaveRequest);
+                    db.Save();
+
+                }
+                await context.PostAsync("Your request has been transfered to a human. My sensors indicate intense laughter from his office.");
+            }
+            else
+            {
+                await context.PostAsync("Hmmm maybe you can try asking again");
+            }
         }
 
         [LuisIntent("RequestRemaining")]
