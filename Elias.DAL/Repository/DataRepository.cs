@@ -12,6 +12,11 @@ namespace Elias.DAL.Repository
 {
     public class DataRepository : DataRepositoryBase, IDataRepository
     {
+        protected override IQueryable<Employee> SearchEmployeesQuery(IQueryable<Employee> query, string searchTerm)
+        {
+            return query.Where(w => (w.FirstName != null && w.FirstName.Contains(searchTerm)) || (w.LastName != null && w.LastName.Contains(searchTerm)) || (w.Email != null && w.Email.Contains(searchTerm)));
+        }
+
         /// <summary>
         /// Returns a user entity
         /// </summary>
