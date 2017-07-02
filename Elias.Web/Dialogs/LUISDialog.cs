@@ -139,7 +139,8 @@ namespace Elias.Web.Dialogs
                     using (var db = new DataRepository())
                     {
                         var dateEntity = result.Entities.FirstOrDefault(e => e.Type == "builtin.datetimeV2.date");
-                        var date = DateTime.Parse(dateEntity.Entity);
+                        var date1Array = JArray.FromObject(dateEntity.Resolution["values"]);
+                        var date = date1Array.First["value"].ToObject<DateTime>();
                         var leaverequest = new LeaveRequest()
                         {
                             Id = Guid.NewGuid(),
