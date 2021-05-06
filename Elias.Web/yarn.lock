@@ -4086,9 +4086,9 @@ uglify-to-browserify@~1.0.0:
   integrity sha1-bgkk1r2mta/jSeOabWMoUKD4grc=
 
 underscore@^1.8.3:
-  version "1.10.0"
-  resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.10.0.tgz#4d9fa43b71205a0ed7fca74c57226e235ca7288b"
-  integrity sha512-D2q0sRbIZkDZqVtYpfP9R6lH66RrR7oe1xLpGY+CxYVPZ2etRUjKvVDLq5WFp+jK9jtflF511zv3/Yl936zHUw==
+  version "1.13.1"
+  resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.13.1.tgz#0c1c6bd2df54b6b69f2314066d65b6cde6fcf9d1"
+  integrity sha512-hzSoAVtJF+3ZtiFX0VgfFPHEDRm7Y/QPjGyNo4TVdnDTdft3tr8hEkD25a1jC+TjTuE7tkHGKkhwCgs9dgBB2g==
 
 unicode-canonical-property-names-ecmascript@^1.0.4:
   version "1.0.4"
